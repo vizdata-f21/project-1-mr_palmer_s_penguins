@@ -16,6 +16,49 @@ olympics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/t
 
 ## Evan
 
+``` r
+# Get vector of sports to keep: ie. those that have at least 5 observations per gender
+sports_to_keep <- olympics %>%
+  group_by(sport, sex) %>%
+  summarise(n_per_gender = n()) %>%
+  filter(n_per_gender > 5) %>%
+  summarise(genders_per_sport = n()) %>%
+  filter(genders_per_sport == 2) %>%
+  select(sport) %>%
+  pull()
+```
+
+    ## `summarise()` has grouped output by 'sport'. You can override using the `.groups` argument.
+
+``` r
+# Remove all observations from data frame except those from the desired sports we identified above. We also need to remove Croquet and Art Competitions, as those data do not have height or weight measurements.
+olympics_evan <- olympics %>%
+  filter(sport %in% sports_to_keep) %>%
+  filter(!(sport %in% c("Croquet", "Art Competitions")))
+
+# Also im just going to keep summer sports to try to reduce visual overload
+olympics_evan <- olympics_evan %>%
+  filter(season == "Summer")
+
+# Create new needed variables
+olympics_evan <- olympics_evan %>%
+  mutate(medalwinner = if_else(is.na(medal), FALSE, TRUE),
+         h_to_w = height / weight)
+
+# Create plot to examine height to weight ratios and how they vary between sexes and medalwinners and non-medalwinners, and then comparing these trends across sports
+ggplot(olympics_evan, mapping = aes(x = medalwinner, y = h_to_w)) +
+  geom_boxplot(aes(color = sex)) +
+  facet_wrap(vars(sport))
+```
+
+    ## Warning: Removed 50927 rows containing non-finite values (stat_boxplot).
+
+![](proposal_files/figure-gfm/evan-eda-1.png)<!-- -->
+
+``` r
+#TODOS: see what's going on with ice hockey (looks like only males, and only medalwinners) and figure skating (looks like only medalwinners, but both sexes are still represented.)
+```
+
 ## Sarab
 
 ## Drew
