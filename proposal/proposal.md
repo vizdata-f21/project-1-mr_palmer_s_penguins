@@ -1,10 +1,21 @@
 Project proposal
 ================
-Team name
+Mr. Palmer’s Penguins
 
 ``` r
 library(tidyverse)
 ```
+
+    ## Warning in system("timedatectl", intern = TRUE): running command 'timedatectl'
+    ## had status 1
+
+## Evan
+
+## Sarab
+
+## Drew
+
+## Lilly
 
 ## Dataset
 

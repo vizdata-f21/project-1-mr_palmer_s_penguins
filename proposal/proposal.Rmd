@@ -1,12 +1,20 @@
 ---
 title: "Project proposal"
-author: "Team name"
+author: "Mr. Palmer's Penguins"
 output: github_document
 ---
 
 ```{r load-packages, message = FALSE}
 library(tidyverse)
 ```
+
+## Evan
+
+## Sarab
+
+## Drew
+
+## Lilly
 
 ## Dataset
 
