@@ -9,6 +9,11 @@ library(tidyverse)
     ## Warning in system("timedatectl", intern = TRUE): running command 'timedatectl'
     ## had status 1
 
+``` r
+# load data from tidytuesday site
+olympics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv')
+```
+
 ## Evan
 
 ## Sarab
