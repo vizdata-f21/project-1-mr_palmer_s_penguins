@@ -49,6 +49,23 @@ ggplot(olympics_evan, mapping = aes(x = medalwinner, y = h_to_w)) +
 
 ## Sarab
 
+```{r}
+
+olybasket <- filter(olympics, sport == 'Basketball')
+
+yearavg <- olybasket %>%
+  group_by(sex, year) %>%
+  summarise(mean_height = mean(height), na.rm = TRUE)
+
+yearavg
+
+olympics %>%
+  group_by(sex, year) %>%
+  summarise(mean_age = mean(age, na.rm = TRUE)) %>%
+  ggplot(aes(x=year, y = mean_age, group = sex, color = sex)) +
+  geom_line()
+```
+
 ## Drew
 
 Do we have to put data in CSV format in the data folder?
@@ -165,9 +182,9 @@ ggplot(oly_numb, aes(x = index, y = medals, group = id)) +
   geom_line(alpha = 0.05)
 
 oly_numb %>%
-  filter(index > 5) %>%
-  ggplot(aes(x = index, y = medals, group = id)) +
-  geom_line(alpha = 0.1)
+  ggplot(aes(x = index, y = cumsum(medals), color = id)) +
+  geom_line(alpha = 0.1, group = id) +
+  geom_point()
 ```
 
 ```{r}
