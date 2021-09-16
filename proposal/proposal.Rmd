@@ -6,6 +6,7 @@ output: github_document
 
 ```{r load-packages-and-data, message = FALSE}
 library(tidyverse)
+library(lubridate)
 
 # load data from tidytuesday site
 olympics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv')
@@ -116,6 +117,97 @@ The two questions you want to answer.
 A plan for answering each of the questions including the variables involved, variables to be created (if any), external data to be merged in (if any).
 
 ## Lilly
+
+ideas: 
+-relationship between GDP etc
+-which olympics do athletes do best in (i.e. when they participate in multiple, typical peak performance?)
+
+```{r}
+olympics %>%
+  distinct(id, games) %>%
+  group_by(id) %>%
+  count() %>%
+  arrange(desc(n))
+
+olympics_score <- olympics %>%
+  mutate(medal = case_when(
+    medal == "Gold" ~ 3,
+    medal == "Silver" ~ 2,
+    medal == "Bronze" ~ 1,
+    TRUE ~ 0),
+    date = ifelse(season == "Winter", paste0(year, "-02-01"), paste0(year, "-07-01")),
+    date = ymd(date))
+
+olympics_wider <- olympics_score %>%
+  group_by(id, date, medal) %>%
+  summarize(medals = sum(medal)) %>%
+  select(-medal)
+
+oly_numb <- olympics_wider %>%
+  # number rows within each id to allow for pivoting
+  group_by(id) %>%
+  mutate(index = row_number()) %>%
+  ungroup()
+         #event = paste0(date, ", ", medals))
+
+# pivot dates for same id into new columns
+oly_numb %>%
+  select(id, index, medals) %>%
+  tidyr::pivot_wider(names_from = index, values_from = medals) %>%
+  colMeans(na.rm = TRUE) %>%
+  round(digits = 2) %>%
+  knitr::kable()
+
+oly_numb %>%
+  count(index)
+
+ggplot(oly_numb, aes(x = index, y = medals, group = id)) +
+  geom_line(alpha = 0.05)
+
+oly_numb %>%
+  filter(index > 5) %>%
+  ggplot(aes(x = index, y = medals, group = id)) +
+  geom_line(alpha = 0.1)
+```
+
+```{r}
+popular_sports <- olympics %>%
+  count(sport) %>%
+  arrange(desc(n)) %>%
+  head(7)
+
+woo <- left_join(popular_sports, olympics, by = "sport")
+```
+
+```{r}
+# which sports are the most common crossovers?
+# does amt of crossovers differ by country
+# heatmap of sports on x and y axis that ppl participate across 
+
+multisport_competitors <- olympics %>%
+  distinct(id, sport) %>%
+  group_by(id) %>%
+  count() %>%
+  arrange(desc(n)) %>%
+  filter(n > 1) %>%
+  left_join(olympics, by = "id")
+
+#multisport_competitors %>%
+#  distinct(name, sport) %>%
+#  pivot_wider(id_cols = "id", names_from = "sport", values_from = "sport") %>%
+#  mutate_all(case_when(
+#    str_detect(., "\\d") ~ .,
+#    str_detect(., "\\w") ~ 1,
+#    TRUE ~ 0))
+```
+
+```{r}
+olympics_score %>%
+  group_by(noc, date, medal) %>%
+  summarize(score = sum(medal)) %>%
+  ggplot(aes(x = date, y = score, group = noc)) +
+  geom_line(alpha = .2)
+```
 
 ## Dataset
 
