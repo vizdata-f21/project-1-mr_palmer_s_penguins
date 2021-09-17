@@ -96,10 +96,33 @@ hosted.
 Responses can also take the form NA if no medal was won or there is
 incomplete information.
 
-We chose this dataset because we think it can provide a strong insights
-into some of the trends at the Olympics over the past century as well as
-provide opportunities for our group to develop our visualization
-capabilities.
+\<\<\<\<\<\<\< HEAD We chose this dataset because we think it can
+provide a lot of good insights into some of the trends at the Olympics
+over the past century as well as provide strong opportunities for our
+group to develop our visualization capabilities.
+
+These data offer many avenues to explore when analyzing, such as
+medalwinning success on an athlete-level scale, on a country-level
+scale, or for a particular sport over time, etc. Complementing this
+variety of potential analysis paradigms is the medley of variable types.
+Several variable types such as categorical, ordinal, time-series, and
+ratio are well represented in the data. This also affords us the
+opportunity to calculate new variables, such as converting the medal
+variable into a logical medal winner or non-medal winner.
+
+Finally, aside from the properties of the data itself, we chose to
+analyze data from the Olympic games due to the recency of the 2020 Tokyo
+Games and the role of the Games in reflecting the global culture of a
+time period. Historic events like the 1980 Moscow Games that were
+boycotted by the US and many other countries, the several instances of
+Games that were cancelled during the World Wars, and the late 1980s
+advent of professional superstar Olympians all potentially provide
+insights into the story told by the data.
+
+\======= We chose this dataset because we think it can provide a strong
+insights into some of the trends at the Olympics over the past century
+as well as provide opportunities for our group to develop our
+visualization capabilities.
 
 These data offer many avenues to explore when analyzing, such as
 medalwinning success on an athlete-level scale, on a country-level
@@ -136,6 +159,7 @@ opportunities to recode some of the existing variables
   - 
 Source: TidyTuesday
 <https://github.com/rfordatascience/tidytuesday/tree/master/data/2021#readme>
+\>\>\>\>\>\>\> 7c70d95441aec295a1e92da9d71e2872877d663c
 
 Source: Kaggle
 <https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results>
