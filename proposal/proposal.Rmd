@@ -60,30 +60,13 @@ A unique number associated with each athlete
 
 `Event` - The event the athlete is competing in.
 
-`Medal` - Indicates whether a Gold, Silver, or Bronze medal was one. Responses can also take the form NA if no medal was won or there is incomplete information.
-
-We chose this dataset
-
-
-The reason why you chose this dataset.
+`Medal` - Indicates whether a Gold, Silver, or Bronze medal was won. Responses can also take the form NA if no medal was won or there is incomplete information.
 
 We chose this dataset because we think it can provide a lot of good insights into some of the trends at the Olympics over the past century as well as provide strong opportunities for our group to develop our visualization capabilities. 
 
-The Olympics have always been a special global event. Countries from around the world come together to compete in a range of events. This share commitment to uniting the global community has time and time allowed ath
-Ahtletes =  what makes them successful
-Country information
-Historical information about events
-Outcomes
+These data offer many avenues to explore when analyzing, such as medalwinning success on an athlete-level scale, on a country-level scale, or for a particular sport over time, etc. Complementing this variety of potential analysis paradigms is the medley of variable types. Several variable types such as categorical, ordinal, time-series, and ratio are well represented in the data. This also affords us the opportunity to calculate new variables, such as converting the medal variable into a logical medal winner or non-medal winner.
 
-Evan: These data offer many avenues to explore when analyzing, such as medalwinning success on an athlete-level scale, on a country-level scale, for a particular sport over time, etc. Complementing this variety of potential analysis paradigms is the mixture of variable types. Common variable types of categorical, ordinal, time-series, and ratio are well represented in the data. This also affords us the opportunity to calculate new variables, such as converting the medal variable into a logical medal winner or non-medal winner.
-
-Diversity of information (categorical and numeric =  good for analysis, opportunities to recode some of the existing variables
-
-* Just finished the olympics
-* Bringing together the global community, often reflective of broader social, cultural, and economic happenings in our world
-* 
-
-Evan: Finally, aside from the properties of the data itself, we chose to analyze data from the Olympic games due to the recency of the 2020 Tokyo Games and the role of the Games in reflecting the global culture of a time period. Historic events like the 1980 Moscow Games that were boycotted by the US and many other countries, the Games that were cancelled during the World Wars, and the modern advent of professional superstar Olympians all potentially provide insights into the story told by the data.
+Finally, aside from the properties of the data itself, we chose to analyze data from the Olympic games due to the recency of the 2020 Tokyo Games and the role of the Games in reflecting the global culture of a time period. Historic events like the 1980 Moscow Games that were boycotted by the US and many other countries, the several instances of Games that were cancelled during the World Wars, and the late 1980s advent of professional superstar Olympians all potentially provide insights into the story told by the data.
 
 
 
