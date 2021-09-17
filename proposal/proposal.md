@@ -4,6 +4,7 @@ Mr. Palmer’s Penguins
 
 ``` r
 library(tidyverse)
+<<<<<<< HEAD
 ```
 
     ## Warning in system("timedatectl", intern = TRUE): running command 'timedatectl'
@@ -15,6 +16,15 @@ library(lubridate)
 # load data from tidytuesday site and write to csv in data folder
 readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv') %>%
   write_csv(file = "/home/guest/project-01/data/olympics_data.csv")
+=======
+
+# load data from tidytuesday site and write to csv in data folder
+readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv') %>%
+  write_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
+
+# read data from csv
+olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
+>>>>>>> bc2a69f26d23e2c1d1d12ef26a2a736a4dc4c2f7
 ```
 
 ## Sarab
@@ -160,6 +170,7 @@ A plan for answering each of the questions including the variables
 involved, variables to be created (if any), external data to be merged
 in (if any).
 
+<<<<<<< HEAD
 ## Lilly
 
 ideas: -relationship between GDP etc -which olympics do athletes do best
@@ -324,6 +335,8 @@ olympics_score %>%
 
 ![](proposal_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
+=======
+>>>>>>> bc2a69f26d23e2c1d1d12ef26a2a736a4dc4c2f7
 ## Dataset
 
 A brief description of your dataset including its provenance,
