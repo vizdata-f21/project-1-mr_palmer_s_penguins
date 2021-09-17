@@ -4,86 +4,37 @@ Mr. Palmer’s Penguins
 
 ``` r
 library(tidyverse)
+
+# load data from tidytuesday site and write to csv in data folder
+readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv') %>%
+  write_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
+
+# read data from csv
+olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
 ```
 
-    ## Warning in system("timedatectl", intern = TRUE): running command 'timedatectl'
-    ## had status 1
-
-``` r
-library(lubridate)
-
-# load data from tidytuesday site
-olympics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv')
-```
-
-## Evan
-
-``` r
-# Get vector of sports to keep: ie. those that have at least 5 observations per gender
-sports_to_keep <- olympics %>%
-  group_by(sport, sex) %>%
-  summarise(n_per_gender = n()) %>%
-  filter(n_per_gender > 5) %>%
-  summarise(genders_per_sport = n()) %>%
-  filter(genders_per_sport == 2) %>%
-  select(sport) %>%
-  pull()
-```
-
-    ## `summarise()` has grouped output by 'sport'. You can override using the `.groups` argument.
-
-``` r
-# Remove all observations from data frame except those from the desired sports we identified above. We also need to remove Croquet and Art Competitions, as those data do not have height or weight measurements.
-olympics_evan <- olympics %>%
-  filter(sport %in% sports_to_keep) %>%
-  filter(!(sport %in% c("Croquet", "Art Competitions")))
-
-# Also im just going to keep summer sports to try to reduce visual overload
-olympics_evan <- olympics_evan %>%
-  filter(season == "Summer")
-
-# Create new needed variables
-olympics_evan <- olympics_evan %>%
-  mutate(medalwinner = if_else(is.na(medal), FALSE, TRUE),
-         h_to_w = height / weight)
-
-# Create plot to examine height to weight ratios and how they vary between sexes and medalwinners and non-medalwinners, and then comparing these trends across sports
-ggplot(olympics_evan, mapping = aes(x = medalwinner, y = h_to_w)) +
-  geom_boxplot(aes(color = sex)) +
-  facet_wrap(vars(sport))
-```
-
-    ## Warning: Removed 50927 rows containing non-finite values (stat_boxplot).
-
-![](proposal_files/figure-gfm/evan-eda-1.png)<!-- -->
-
-``` r
-#TODOS: see what's going on with ice hockey (looks like only males, and only medalwinners) and figure skating (looks like only medalwinners, but both sexes are still represented.)
-```
-
-## Sarab
-
-## Drew
-
-Do we have to put data in CSV format in the data folder?
+## Dataset
 
 This dataset was accessed on Kaggle.com and includes data scraped in May
 2018 from Sports Reference/OlympStats, sports statistics sites, by Randi
-Griffin, a Senior Data Scientist at Boston Consulting Group.
+Griffin, a Senior Data Scientist at Boston Consulting Group. Moreover,
+it was selected as part of the TidyTuesday challenge on 7/27/21.
+Citation information is included at the bottom of this section.
 
-The set, which includes 15 variables and 271,116 observations, provides
-insight into the athletes that competed in and results of the Olympic
-games from Athens 1896 to Rio 2016. Each observation includes
+The set, which includes 15 variables and 271116 observations, provides
+insight into the athletes that competed in and the results of the
+Olympic games from Athens 1896 to Rio 2016. Each observation includes
 information about an athlete on a per event basis. Therefore, if an
-athlete competes in multiple different athletic events, there will be
-multiple observations with each reflecting an individual event. Each
-observation details medal results, the athlete’s background (age, sex,
-height, weight, team, etc.), and context about the event (where and when
-it was held, season, etc.).
+athlete competes in multiple different events, there will be multiple
+different observations reflecting each event an individual participated
+in. Each observation details medal results (Gold, Silver, Bronze, or
+NA), the athlete’s background (age, sex, height, weight, team, etc.),
+and context about the event (where and when it was held, season, etc.).
 
 The full list of variables are included here and described below:
 
 ``` r
+#olympics <- read_csv("/home/guest/project-01/data/olympics_data.csv")
 glimpse(olympics)
 ```
 
@@ -105,23 +56,24 @@ glimpse(olympics)
     ## $ event  <chr> "Basketball Men's Basketball", "Judo Men's Extra-Lightweight", …
     ## $ medal  <chr> NA, NA, NA, "Gold", NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
 
-`ID` - This is a number assigned uniquely to each athlete. A unique
-number associated with each athlete
+`ID` - This is an athlete-specific number. Each athlete is assigned one
+unique identifying number in the dataset
 
 `Name` - The name of the athlete competing.
 
 `Sex` - Indicated whether the athlete is Male (M) or Female (F)
 
-`Age` - The age of the athlete in years.
+`Age` - The age of the athlete in years
 
-`Height` - The height of the athlete in centimeters.
+`Height` - The height of the athlete in centimeters
 
-`Weight` - The weight of the athlete in kilograms.
+`Weight` - The weight of the athlete in kilograms
 
-`Team` - The team (country in most cases) the athlete represents.
+`Team` - The team (same as the country in most cases) the athlete
+represents
 
-`NOC` - The 3-letter National Olympic Committee associated wit each team
-(country in most cases)
+`NOC` - The 3-letter National Olympic Committee code associated with
+each team (indicative of country in most cases)
 
 `Games` - The year (1896-2016) and season (Summer or Winter) in which
 the event took place. This is a character combination of `Year` and
@@ -129,32 +81,47 @@ the event took place. This is a character combination of `Year` and
 currently alternate every two years, but used to take place in the same
 year.
 
-`Year` - The year (1896-2016) in which the event took place. `Season` -
-The season (Summer or Winter) in which the event took place.
+`Year` - The year (1896-2016) in which the event took place.
+
+`Season` - The season (Summer or Winter) in which the event took place.
 
 `City` - The city in which the Olympic games for that year/season were
 hosted.
 
 `Sport` - The sport the athlete is competing in.
 
-`Event` - The event the athlete is competing in.
+`Event` - The event the athlete is competing in within a sport.
 
-`Medal` - Indicates whether a Gold, Silver, or Bronze medal was one.
+`Medal` - Indicates whether a Gold, Silver, or Bronze medal was won.
 Responses can also take the form NA if no medal was won or there is
 incomplete information.
 
-We chose this dataset
+We chose this dataset because we think it can provide a strong insights
+into some of the trends at the Olympics over the past century as well as
+provide opportunities for our group to develop our visualization
+capabilities.
 
-The reason why you chose this dataset.
+These data offer many avenues to explore when analyzing, such as
+medalwinning success on an athlete-level scale, on a country-level
+scale, for a particular sport over time, etc. Complementing this variety
+of potential analysis paradigms is the mixture of variable types. Common
+variable types of categorical, ordinal, time-series, and ratio are well
+represented in the data. This also affords us the opportunity to
+calculate new variables, such as converting the medal variable into a
+logical medal winner or non-medal winner.
 
-We chose this dataset because we think it can provide a lot of good
-insights into some of the trends at the Olympics over the past century
-as well as provide strong opportunities for our group to develop our
-visualization capabilities.
+Finally, aside from the properties of the data itself, we chose to
+analyze data from the Olympic games due to the recency of the 2020 Tokyo
+Games and the role of the Games in reflecting the global culture of a
+time period. Historic events like the 1980 Moscow Games that were
+boycotted by the US and many other countries, the Games that were
+cancelled during the World Wars, and the modern advent of professional
+superstar Olympians all potentially provide insights into the story told
+by the data.
 
-The Olympics have always been a special global event. Countries from
-around the world come together to compete in a range of events. This
-share commitment to uniting the global community has time and time
+Notes: The Olympics have always been a special global event. Countries
+from around the world come together to compete in a range of events.
+This share commitment to uniting the global community has time and time
 allowed ath Ahtletes = what makes them successful Country information
 Historical information about events Outcomes
 
@@ -167,145 +134,69 @@ opportunities to recode some of the existing variables
     social, cultural, and economic happenings in our world
 
   - 
-The two questions you want to answer.
+Source: TidyTuesday
+<https://github.com/rfordatascience/tidytuesday/tree/master/data/2021#readme>
 
-A plan for answering each of the questions including the variables
-involved, variables to be created (if any), external data to be merged
-in (if any).
-
-## Lilly
-
-ideas: -relationship between GDP etc -which olympics do athletes do best
-in (i.e. when they participate in multiple, typical peak performance?)
-
-``` r
-olympics %>%
-  distinct(id, games) %>%
-  group_by(id) %>%
-  count() %>%
-  arrange(desc(n))
-```
-
-    ## # A tibble: 135,571 × 2
-    ## # Groups:   id [135,571]
-    ##       id     n
-    ##    <dbl> <int>
-    ##  1 79855    10
-    ##  2 65378     9
-    ##  3 99155     9
-    ##  4 14388     8
-    ##  5 26880     8
-    ##  6 28051     8
-    ##  7 28052     8
-    ##  8 32458     8
-    ##  9 51618     8
-    ## 10 61572     8
-    ## # … with 135,561 more rows
-
-``` r
-olympics_wider <- olympics %>%
-  mutate(medal = case_when(
-    medal == "Gold" ~ 3,
-    medal == "Silver" ~ 2,
-    medal == "Bronze" ~ 1,
-    TRUE ~ 0),
-    date = ifelse(season == "Winter", paste0(year, "-02-01"), paste0(year, "-07-01")),
-    date = ymd(date)) %>%
-  group_by(id, date, medal) %>%
-  summarize(medals = sum(medal)) %>%
-  select(-medal)
-```
-
-    ## `summarise()` has grouped output by 'id', 'date'. You can override using the `.groups` argument.
-
-``` r
-oly_numb <- olympics_wider %>%
-  # number rows within each id to allow for pivoting
-  group_by(id) %>%
-  mutate(index = row_number()) %>%
-  ungroup()
-         #event = paste0(date, ", ", medals))
-
-# pivot dates for same id into new columns
-oly_numb %>%
-  select(id, index, medals) %>%
-  tidyr::pivot_wider(names_from = index, values_from = medals) %>%
-  colMeans(na.rm = TRUE) %>%
-  round(digits = 2) %>%
-  knitr::kable()
-```
-
-|    |        x |
-| :- | -------: |
-| id | 67786.00 |
-| 1  |     0.27 |
-| 2  |     0.58 |
-| 3  |     0.70 |
-| 4  |     0.94 |
-| 5  |     1.10 |
-| 6  |     1.29 |
-| 7  |     1.55 |
-| 8  |     1.58 |
-| 9  |     1.71 |
-| 10 |     1.47 |
-| 11 |     1.71 |
-| 12 |     1.43 |
-| 13 |     1.20 |
-| 14 |     4.50 |
-
-``` r
-oly_numb %>%
-  count(index)
-```
-
-    ## # A tibble: 14 × 2
-    ##    index      n
-    ##    <int>  <int>
-    ##  1     1 135571
-    ##  2     2  40528
-    ##  3     3  13675
-    ##  4     4   4993
-    ##  5     5   2022
-    ##  6     6    921
-    ##  7     7    448
-    ##  8     8    231
-    ##  9     9    114
-    ## 10    10     57
-    ## 11    11     28
-    ## 12    12     14
-    ## 13    13      5
-    ## 14    14      2
-
-``` r
-ggplot(oly_numb, aes(x = index, y = medals, group = id)) +
-  geom_line(alpha = 0.05)
-```
-
-![](proposal_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
-
-``` r
-oly_numb %>%
-  filter(index > 5) %>%
-  ggplot(aes(x = index, y = medals, group = id)) +
-  geom_line(alpha = 0.1)
-```
-
-![](proposal_files/figure-gfm/unnamed-chunk-1-2.png)<!-- -->
-
-## Dataset
-
-A brief description of your dataset including its provenance,
-dimensions, etc. as well as the reason why you chose this dataset.
-
-Make sure to load the data and use inline code for some of this
-information.
+Source: Kaggle
+<https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results>
 
 ## Questions
 
 The two questions you want to answer.
 
+1.  How have the physical characteristics (height-to-weight ratio, age,
+    and sex) of Olympic participants changed over time and do they
+    differ by sport?
+
+Variables: `height`, `weight`, `age`, `sex`, `sport`, `year`
+
+2.  How has the success of different countries in a particular sport
+    changed with time?
+
+Variables: `year`, `NOC`, `medal count`, `sport`
+
 ## Analysis plan
 
-A plan for answering each of the questions including the variables
-involved, variables to be created (if any), external data to be merged
-in (if any).
+Here is a plan for answering each of the questions including the
+variables involved, variables to be created (if any), and external data
+to be merged in (if any).
+
+### For Question 1
+
+Sarab
+
+### For Question 2
+
+The original variables we will use to answer this question are `noc`,
+`medal`, `sport` (perhaps `event` if some higher granularity proves
+informative rather than overwhelming), and `year` and `season`. Both
+`year` and `season` are important for placing each Olympics in time and
+will require some cleaning in conversion to an accurate variable `date`.
+Many of us are familiar with even recent anomalies in Olympic labeling
+(such as these recent 2020 Summer Olympics, which took place in 2021).
+
+Next, we will mutate `medal` from a categorical variable with ‘Gold’,
+‘Silver’, ‘Bronze’, and NA as outcomes to either a numeric indicator
+(medal = 1 for any win and medal = 0 for no medal received) or a score
+that rewards the most points for Gold, then Silver, then Bronze. Through
+iterative visualization we will determine whether examining success only
+based on medal count or differentiating gold, silver, and bronze
+victories allows for a more meaningful display of trends. We will also
+later group the observations by region of National Olympic Committee, or
+`noc`, which reflects what we understand to be country identities today
+than `team` does. Merging in this [secondary
+dataset](https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results?select=noc_regions.csv)
+provided with the athlete-event level data by Kaggle will allow us to
+expand our country labeling from three-letter NOC abbreviations to
+complete country names. Additionally, the dataframe in the package
+[countrycode](https://vincentarelbundock.github.io/countrycode/) links
+countries by their names in various formats to their unicode flag
+emojis. Merging this data in will assist us with our visualizations of
+this question.
+
+After the above merging and necessary cleaning, we will group the data
+by `country`, `sport`, and `date` to compute a new variable called
+`medals_total`. These steps should allow us to begin an initial approach
+to visualization, for example, by plotting `medals_total` on the y-axis
+and `date` on the x-axis with lines grouped by `country` and faceting by
+`sport`.
