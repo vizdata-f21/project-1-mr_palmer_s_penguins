@@ -34,7 +34,6 @@ and context about the event (where and when it was held, season, etc.).
 The full list of variables are included here and described below:
 
 ``` r
-#olympics <- read_csv("/home/guest/project-01/data/olympics_data.csv")
 glimpse(olympics)
 ```
 
@@ -96,10 +95,10 @@ hosted.
 Responses can also take the form NA if no medal was won or there is
 incomplete information.
 
-\<\<\<\<\<\<\< HEAD We chose this dataset because we think it can
-provide a lot of good insights into some of the trends at the Olympics
-over the past century as well as provide strong opportunities for our
-group to develop our visualization capabilities.
+We chose this dataset because we think it can provide a lot of good
+insights into some of the trends at the Olympics over the past century
+as well as provide strong opportunities for our group to develop our
+visualization capabilities.
 
 These data offer many avenues to explore when analyzing, such as
 medalwinning success on an athlete-level scale, on a country-level
@@ -111,59 +110,21 @@ opportunity to calculate new variables, such as converting the medal
 variable into a logical medal winner or non-medal winner.
 
 Finally, aside from the properties of the data itself, we chose to
-analyze data from the Olympic games due to the recency of the 2020 Tokyo
-Games and the role of the Games in reflecting the global culture of a
-time period. Historic events like the 1980 Moscow Games that were
+analyze data from the Olympic games due to the recency of the 2020/2021
+Tokyo Games and the role of the Games in reflecting the global culture
+of a time period. Historic events like the 1980 Moscow Games that were
 boycotted by the US and many other countries, the several instances of
 Games that were cancelled during the World Wars, and the late 1980s
 advent of professional superstar Olympians all potentially provide
 insights into the story told by the data.
 
-\======= We chose this dataset because we think it can provide a strong
-insights into some of the trends at the Olympics over the past century
-as well as provide opportunities for our group to develop our
-visualization capabilities.
-
-These data offer many avenues to explore when analyzing, such as
-medalwinning success on an athlete-level scale, on a country-level
-scale, for a particular sport over time, etc. Complementing this variety
-of potential analysis paradigms is the mixture of variable types. Common
-variable types of categorical, ordinal, time-series, and ratio are well
-represented in the data. This also affords us the opportunity to
-calculate new variables, such as converting the medal variable into a
-logical medal winner or non-medal winner.
-
-Finally, aside from the properties of the data itself, we chose to
-analyze data from the Olympic games due to the recency of the 2020 Tokyo
-Games and the role of the Games in reflecting the global culture of a
-time period. Historic events like the 1980 Moscow Games that were
-boycotted by the US and many other countries, the Games that were
-cancelled during the World Wars, and the modern advent of professional
-superstar Olympians all potentially provide insights into the story told
-by the data.
-
-Notes: The Olympics have always been a special global event. Countries
-from around the world come together to compete in a range of events.
-This share commitment to uniting the global community has time and time
-allowed ath Ahtletes = what makes them successful Country information
-Historical information about events Outcomes
-
-Diversity of information (categorical and numeric = good for analysis,
-opportunities to recode some of the existing variables
-
-  - Just finished the olympics
-
-  - Bringing together the global community, often reflective of broader
-    social, cultural, and economic happenings in our world
-
-  - 
 Source: TidyTuesday
-<https://github.com/rfordatascience/tidytuesday/tree/master/data/2021#readme>
-\>\>\>\>\>\>\> 7c70d95441aec295a1e92da9d71e2872877d663c
+
+<https://github.com/rfordatascience/tidytuesday/tree/master/data/2021#readme7c70d95441aec295a1e92da9d71e2872877d663c>
 
 Source: Kaggle
+
 <https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results>
-\>\>\>\>\>\>\> 7c70d95441aec295a1e92da9d71e2872877d663c
 
 ## Questions
 
@@ -182,9 +143,7 @@ Variables: `year`, `NOC`, `medal count`, `sport`
 
 ## Analysis plan
 
-Here is a plan for answering each of the questions including the
-variables involved, variables to be created (if any), and external data
-to be merged in (if any).
+Here is a plan for answering each of the questions:
 
 ### For Question 1
 
@@ -206,17 +165,18 @@ see if we can find anything interesting.
 We now want to see how this ratio and other characteristics, like height
 and weight individually, differ in different sports. We can accomplish
 this by plotting `height` and `weight`, maybe with boxplots, and
-faceting by `sport`. To make the analysis a little easier, we should
-group by `sex`. To see how these values have changed over the years, we
-will then use `year` to make time series line plots for these different
-values. We can also facet these plots by `sport` to see if, for example,
-height of athletes has changed more or less over time in one sport as
-compared to another. Another part of the question we may be able to
-answer pertains to the effect of athletes’ age on physical
-characteristics. We can plot `height` and `weight` against `age` as a
-continuous variable, or we can transform `age` into a discrete, factor
-variable and create boxplots for different characteristics at different
-age levels.
+faceting by `sport`. Moreover, we also plan to analyze this information
+by `sex` since characteristics can differ for each division.
+
+To see how these values have changed over the years, we will then use
+`year` to make time series line plots for these different values. We can
+also facet these plots by `sport` to see if, for example, height of
+athletes has changed more or less over time in one sport as compared to
+another. Another part of the question we may be able to answer pertains
+to the effect of athletes’ age on physical characteristics. We can plot
+`height` and `weight` against `age` as a continuous variable, or we can
+transform `age` into a discrete, factor variable and create boxplots for
+different characteristics at different age levels.
 
 ### For Question 2
 
@@ -237,7 +197,7 @@ based on medal count or differentiating gold, silver, and bronze
 victories allows for a more meaningful display of trends. We will also
 later group the observations by region of National Olympic Committee, or
 `noc`, which reflects what we understand to be country identities today
-than `team` does. Merging in this [secondary
+more accurately than `team` does. Merging in this [secondary
 dataset](https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results?select=noc_regions.csv)
 provided with the athlete-event level data by Kaggle will allow us to
 expand our country labeling from three-letter NOC abbreviations to
