@@ -19,10 +19,7 @@ olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
 
 This dataset was accessed on Kaggle.com and includes data scraped in May 2018 from Sports Reference/OlympStats, sports statistics sites, by Randi Griffin, a Senior Data Scientist at Boston Consulting Group. Moreover, it was selected as part of the TidyTuesday challenge on 7/27/21. Citation information is included at the bottom of this section.
 
-The set, which includes 15 variables and 271,116 observations, provides insight into the athletes that competed in and results of the Olympic games from Athens 1896 to Rio 2016. Each observation includes information about an athlete on a per event basis. Therefore, if an athlete competes in multiple different athletic events, there will be multiple observations with each reflecting an individual event. Each observation details medal results, the athlete's background (age, sex, height, weight, team, etc.), and context about the event (where and when it was held, season, etc.).
-=======
 The set, which includes `r ncol(olympics)` variables and `r nrow(olympics)` observations, provides insight into the athletes that competed in and the results of the Olympic games from Athens 1896 to Rio 2016. Each observation includes information about an athlete on a per event basis. Therefore, if an athlete competes in multiple different events, there will be multiple different observations reflecting each event an individual participated in. Each observation details medal results (Gold, Silver, Bronze, or NA), the athlete's background (age, sex, height, weight, team, etc.), and context about the event (where and when it was held, season, etc.).
->>>>>>> 7c70d95441aec295a1e92da9d71e2872877d663c
 
 The full list of variables are included here and described below:
 
@@ -104,11 +101,11 @@ Here is a plan for answering each of the questions including the variables invol
 
 ### For Question 1
 
-To answer our first question, we will evaluate the variables `height`, `weight`, `age`, `sex`, `sport`, and `year`. After looking at the dataset, we were interested in exploring the physical characteristics of Olympic athletes. We are all used to hearing that these athletes are in peak physical condition, but this classification differs by sport and has changed over the years.
+To answer our first question, we will evaluate the variables `height`, `weight`, `age`, `sex`, `sport`, and `year`. After looking at the dataset, we are interested in exploring the physical characteristics of Olympic athletes. We are all used to hearing that these athletes are in peak physical condition, but this classification differs by sport and has probably changed over the years.
 
-We will start by creating some new variables, the first being `height-weight-ratio`. We are interested in exploring the height to weight ratio for different sports in the Olympics, as different shows require different body-types for success. For example, volleyball and basketball players are usually exceptionally tall, while wrestlers are usually shorter and built. We will create this variable and some plots to see if we can recognize any interesting info. We will also create other exploratory variables like `height-weight-ratio-by-age` to see if this ratio differs by age.
+We will start by creating a new variable, `height-weight-ratio`. We are interested in exploring the height to weight ratio for different sports in the Olympics, as different sports require different body-types for success. For example, volleyball and basketball players are usually exceptionally tall, while wrestlers are usually shorter and built. We will create this variable and use it in our exploration of the data to see if we can find anything interesting.
 
-Finally, after creating these variables, we want to see how these ratios and other characteristics, like height and weight, differ in different sports. We can accomplish this by faceting by sport. To see how these values have changed over the years, we will use `year` to make time series plots for these different values.
+We now want to see how this ratio and other characteristics, like height and weight individually, differ in different sports. We can accomplish this by plotting height and weight, maybe with boxplots, and faceting by sport. To make the analysis a little easier, we should group by sex. To see how these values have changed over the years, we will then use `year` to make time series line plots for these different values. We can also facet these plots by sport to see if, for example, height has changed more or less over time in one sport as compared to another. Another part of the question we may be able to answer pertains to the effect of athletes' age on physical characteristics. We can plot height and weight against age as a continuous variable, or we can transform age into a discrete, factor variable and create boxplots for different characteristics at different age levels.
 
 ### For Question 2
 
