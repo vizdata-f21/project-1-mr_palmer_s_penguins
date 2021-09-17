@@ -165,8 +165,11 @@ see if we can find anything interesting.
 We now want to see how this ratio and other characteristics, like height
 and weight individually, differ in different sports. We can accomplish
 this by plotting `height` and `weight`, maybe with boxplots, and
-faceting by `sport`. Moreover, we also plan to analyze this information
-by `sex` since characteristics can differ for each division.
+faceting by `sport`. Based on the results, we might pick a few select
+sports to focus in on or group the sports based on common
+characteristics since there are many (probably too many for one plot) to
+facet by. Moreover, we also plan to analyze this information by `sex`
+since characteristics can differ for each division.
 
 To see how these values have changed over the years, we will then use
 `year` to make time series line plots for these different values. We can
