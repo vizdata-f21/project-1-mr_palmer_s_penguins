@@ -4,6 +4,19 @@ Mr. Palmer’s Penguins
 
 ``` r
 library(tidyverse)
+<<<<<<< HEAD
+```
+
+    ## Warning in system("timedatectl", intern = TRUE): running command 'timedatectl'
+    ## had status 1
+
+``` r
+library(lubridate)
+
+# load data from tidytuesday site and write to csv in data folder
+readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv') %>%
+  write_csv(file = "/home/guest/project-01/data/olympics_data.csv")
+=======
 
 # load data from tidytuesday site and write to csv in data folder
 readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv') %>%
@@ -11,6 +24,7 @@ readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/m
 
 # read data from csv
 olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
+>>>>>>> bc2a69f26d23e2c1d1d12ef26a2a736a4dc4c2f7
 ```
 
 ## Sarab
@@ -32,6 +46,21 @@ height, weight, team, etc.), and context about the event (where and when
 it was held, season, etc.).
 
 The full list of variables are included here and described below:
+
+``` r
+olympics <- read_csv("/home/guest/project-01/data/olympics_data.csv")
+```
+
+    ## Rows: 271116 Columns: 15
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (10): name, sex, team, noc, games, season, city, sport, event, medal
+    ## dbl  (5): id, age, height, weight, year
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 ``` r
 glimpse(olympics)
@@ -108,6 +137,15 @@ share commitment to uniting the global community has time and time
 allowed ath Ahtletes = what makes them successful Country information
 Historical information about events Outcomes
 
+Evan: These data offer many avenues to explore when analyzing, such as
+medalwinning success on an athlete-level scale, on a country-level
+scale, for a particular sport over time, etc. Complementing this variety
+of potential analysis paradigms is the mixture of variable types. Common
+variable types of categorical, ordinal, time-series, and ratio are well
+represented in the data. This also affords us the opportunity to
+calculate new variables, such as converting the medal variable into a
+logical medal winner or non-medal winner.
+
 Diversity of information (categorical and numeric = good for analysis,
 opportunities to recode some of the existing variables
 
@@ -117,12 +155,188 @@ opportunities to recode some of the existing variables
     social, cultural, and economic happenings in our world
 
   - 
+Evan: Finally, aside from the properties of the data itself, we chose to
+analyze data from the Olympic games due to the recency of the 2020 Tokyo
+Games and the role of the Games in reflecting the global culture of a
+time period. Historic events like the 1980 Moscow Games that were
+boycotted by the US and many other countries, the Games that were
+cancelled during the World Wars, and the modern advent of professional
+superstar Olympians all potentially provide insights into the story told
+by the data.
+
 The two questions you want to answer.
 
 A plan for answering each of the questions including the variables
 involved, variables to be created (if any), external data to be merged
 in (if any).
 
+<<<<<<< HEAD
+## Lilly
+
+ideas: -relationship between GDP etc -which olympics do athletes do best
+in (i.e. when they participate in multiple, typical peak performance?)
+
+``` r
+olympics %>%
+  distinct(id, games) %>%
+  group_by(id) %>%
+  count() %>%
+  arrange(desc(n))
+```
+
+    ## # A tibble: 135,571 × 2
+    ## # Groups:   id [135,571]
+    ##       id     n
+    ##    <dbl> <int>
+    ##  1 79855    10
+    ##  2 65378     9
+    ##  3 99155     9
+    ##  4 14388     8
+    ##  5 26880     8
+    ##  6 28051     8
+    ##  7 28052     8
+    ##  8 32458     8
+    ##  9 51618     8
+    ## 10 61572     8
+    ## # … with 135,561 more rows
+
+``` r
+olympics_score <- olympics %>%
+  mutate(medal = case_when(
+    medal == "Gold" ~ 3,
+    medal == "Silver" ~ 2,
+    medal == "Bronze" ~ 1,
+    TRUE ~ 0),
+    date = ifelse(season == "Winter", paste0(year, "-02-01"), paste0(year, "-07-01")),
+    date = ymd(date))
+
+olympics_wider <- olympics_score %>%
+  group_by(id, date, medal) %>%
+  summarize(medals = sum(medal)) %>%
+  select(-medal)
+```
+
+    ## `summarise()` has grouped output by 'id', 'date'. You can override using the `.groups` argument.
+
+``` r
+oly_numb <- olympics_wider %>%
+  # number rows within each id to allow for pivoting
+  group_by(id) %>%
+  mutate(index = row_number()) %>%
+  ungroup()
+         #event = paste0(date, ", ", medals))
+
+# pivot dates for same id into new columns
+oly_numb %>%
+  select(id, index, medals) %>%
+  tidyr::pivot_wider(names_from = index, values_from = medals) %>%
+  colMeans(na.rm = TRUE) %>%
+  round(digits = 2) %>%
+  knitr::kable()
+```
+
+|    |        x |
+| :- | -------: |
+| id | 67786.00 |
+| 1  |     0.27 |
+| 2  |     0.58 |
+| 3  |     0.70 |
+| 4  |     0.94 |
+| 5  |     1.10 |
+| 6  |     1.29 |
+| 7  |     1.55 |
+| 8  |     1.58 |
+| 9  |     1.71 |
+| 10 |     1.47 |
+| 11 |     1.71 |
+| 12 |     1.43 |
+| 13 |     1.20 |
+| 14 |     4.50 |
+
+``` r
+oly_numb %>%
+  count(index)
+```
+
+    ## # A tibble: 14 × 2
+    ##    index      n
+    ##    <int>  <int>
+    ##  1     1 135571
+    ##  2     2  40528
+    ##  3     3  13675
+    ##  4     4   4993
+    ##  5     5   2022
+    ##  6     6    921
+    ##  7     7    448
+    ##  8     8    231
+    ##  9     9    114
+    ## 10    10     57
+    ## 11    11     28
+    ## 12    12     14
+    ## 13    13      5
+    ## 14    14      2
+
+``` r
+ggplot(oly_numb, aes(x = index, y = medals, group = id)) +
+  geom_line(alpha = 0.05)
+```
+
+![](proposal_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+``` r
+oly_numb %>%
+  filter(index > 5) %>%
+  ggplot(aes(x = index, y = medals, group = id)) +
+  geom_line(alpha = 0.1)
+```
+
+![](proposal_files/figure-gfm/unnamed-chunk-2-2.png)<!-- -->
+
+``` r
+popular_sports <- olympics %>%
+  count(sport) %>%
+  arrange(desc(n)) %>%
+  head(7)
+
+woo <- left_join(popular_sports, olympics, by = "sport")
+```
+
+``` r
+# which sports are the most common crossovers?
+# does amt of crossovers differ by country
+# heatmap of sports on x and y axis that ppl participate across 
+
+multisport_competitors <- olympics %>%
+  distinct(id, sport) %>%
+  group_by(id) %>%
+  count() %>%
+  arrange(desc(n)) %>%
+  filter(n > 1) %>%
+  left_join(olympics, by = "id")
+
+#multisport_competitors %>%
+#  distinct(name, sport) %>%
+#  pivot_wider(id_cols = "id", names_from = "sport", values_from = "sport") %>%
+#  mutate_all(case_when(
+#    str_detect(., "\\d") ~ .,
+#    str_detect(., "\\w") ~ 1,
+#    TRUE ~ 0))
+```
+
+``` r
+olympics_score %>%
+  group_by(noc, date, medal) %>%
+  summarize(score = sum(medal)) %>%
+  ggplot(aes(x = date, y = score, group = noc)) +
+  geom_line(alpha = .2)
+```
+
+    ## `summarise()` has grouped output by 'noc', 'date'. You can override using the `.groups` argument.
+
+![](proposal_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+=======
+>>>>>>> bc2a69f26d23e2c1d1d12ef26a2a736a4dc4c2f7
 ## Dataset
 
 A brief description of your dataset including its provenance,

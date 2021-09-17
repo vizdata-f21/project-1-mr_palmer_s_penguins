@@ -28,6 +28,7 @@ The set, which includes 15 variables and 271,116 observations, provides insight 
 The full list of variables are included here and described below:
 
 ```{r}
+olympics <- read_csv("/home/guest/project-01/data/olympics_data.csv")
 glimpse(olympics)
 ```
 
@@ -74,11 +75,19 @@ Country information
 Historical information about events
 Outcomes
 
+Evan: These data offer many avenues to explore when analyzing, such as medalwinning success on an athlete-level scale, on a country-level scale, for a particular sport over time, etc. Complementing this variety of potential analysis paradigms is the mixture of variable types. Common variable types of categorical, ordinal, time-series, and ratio are well represented in the data. This also affords us the opportunity to calculate new variables, such as converting the medal variable into a logical medal winner or non-medal winner.
+
 Diversity of information (categorical and numeric =  good for analysis, opportunities to recode some of the existing variables
 
 * Just finished the olympics
 * Bringing together the global community, often reflective of broader social, cultural, and economic happenings in our world
 * 
+
+Evan: Finally, aside from the properties of the data itself, we chose to analyze data from the Olympic games due to the recency of the 2020 Tokyo Games and the role of the Games in reflecting the global culture of a time period. Historic events like the 1980 Moscow Games that were boycotted by the US and many other countries, the Games that were cancelled during the World Wars, and the modern advent of professional superstar Olympians all potentially provide insights into the story told by the data.
+
+
+
+
 
 The two questions you want to answer.
 
