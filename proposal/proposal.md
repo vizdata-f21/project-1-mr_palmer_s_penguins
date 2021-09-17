@@ -12,60 +12,14 @@ library(tidyverse)
 ``` r
 library(lubridate)
 
-# load data from tidytuesday site
-olympics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv')
-```
-
-## Evan
-
-``` r
-# Get vector of sports to keep: ie. those that have at least 5 observations per gender
-sports_to_keep <- olympics %>%
-  group_by(sport, sex) %>%
-  summarise(n_per_gender = n()) %>%
-  filter(n_per_gender > 5) %>%
-  summarise(genders_per_sport = n()) %>%
-  filter(genders_per_sport == 2) %>%
-  select(sport) %>%
-  pull()
-```
-
-    ## `summarise()` has grouped output by 'sport'. You can override using the `.groups` argument.
-
-``` r
-# Remove all observations from data frame except those from the desired sports we identified above. We also need to remove Croquet and Art Competitions, as those data do not have height or weight measurements.
-olympics_evan <- olympics %>%
-  filter(sport %in% sports_to_keep) %>%
-  filter(!(sport %in% c("Croquet", "Art Competitions")))
-
-# Also im just going to keep summer sports to try to reduce visual overload
-olympics_evan <- olympics_evan %>%
-  filter(season == "Summer")
-
-# Create new needed variables
-olympics_evan <- olympics_evan %>%
-  mutate(medalwinner = if_else(is.na(medal), FALSE, TRUE),
-         h_to_w = height / weight)
-
-# Create plot to examine height to weight ratios and how they vary between sexes and medalwinners and non-medalwinners, and then comparing these trends across sports
-ggplot(olympics_evan, mapping = aes(x = medalwinner, y = h_to_w)) +
-  geom_boxplot(aes(color = sex)) +
-  facet_wrap(vars(sport))
-```
-
-    ## Warning: Removed 50927 rows containing non-finite values (stat_boxplot).
-
-![](proposal_files/figure-gfm/evan-eda-1.png)<!-- -->
-
-``` r
-#TODOS: see what's going on with ice hockey (looks like only males, and only medalwinners) and figure skating (looks like only medalwinners, but both sexes are still represented.)
+# load data from tidytuesday site and write to csv in data folder
+readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv') %>%
+  write_csv(file = "/home/guest/project-01/data/olympics_data.csv")
 ```
 
 ## Sarab
 
 ## Drew
-
-Do we have to put data in CSV format in the data folder?
 
 This dataset was accessed on Kaggle.com and includes data scraped in May
 2018 from Sports Reference/OlympStats, sports statistics sites, by Randi
@@ -82,6 +36,21 @@ height, weight, team, etc.), and context about the event (where and when
 it was held, season, etc.).
 
 The full list of variables are included here and described below:
+
+``` r
+olympics <- read_csv("/home/guest/project-01/data/olympics_data.csv")
+```
+
+    ## Rows: 271116 Columns: 15
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (10): name, sex, team, noc, games, season, city, sport, event, medal
+    ## dbl  (5): id, age, height, weight, year
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 ``` r
 glimpse(olympics)
@@ -158,6 +127,15 @@ share commitment to uniting the global community has time and time
 allowed ath Ahtletes = what makes them successful Country information
 Historical information about events Outcomes
 
+Evan: These data offer many avenues to explore when analyzing, such as
+medalwinning success on an athlete-level scale, on a country-level
+scale, for a particular sport over time, etc. Complementing this variety
+of potential analysis paradigms is the mixture of variable types. Common
+variable types of categorical, ordinal, time-series, and ratio are well
+represented in the data. This also affords us the opportunity to
+calculate new variables, such as converting the medal variable into a
+logical medal winner or non-medal winner.
+
 Diversity of information (categorical and numeric = good for analysis,
 opportunities to recode some of the existing variables
 
@@ -167,6 +145,15 @@ opportunities to recode some of the existing variables
     social, cultural, and economic happenings in our world
 
   - 
+Evan: Finally, aside from the properties of the data itself, we chose to
+analyze data from the Olympic games due to the recency of the 2020 Tokyo
+Games and the role of the Games in reflecting the global culture of a
+time period. Historic events like the 1980 Moscow Games that were
+boycotted by the US and many other countries, the Games that were
+cancelled during the World Wars, and the modern advent of professional
+superstar Olympians all potentially provide insights into the story told
+by the data.
+
 The two questions you want to answer.
 
 A plan for answering each of the questions including the variables
@@ -203,14 +190,16 @@ olympics %>%
     ## # … with 135,561 more rows
 
 ``` r
-olympics_wider <- olympics %>%
+olympics_score <- olympics %>%
   mutate(medal = case_when(
     medal == "Gold" ~ 3,
     medal == "Silver" ~ 2,
     medal == "Bronze" ~ 1,
     TRUE ~ 0),
     date = ifelse(season == "Winter", paste0(year, "-02-01"), paste0(year, "-07-01")),
-    date = ymd(date)) %>%
+    date = ymd(date))
+
+olympics_wider <- olympics_score %>%
   group_by(id, date, medal) %>%
   summarize(medals = sum(medal)) %>%
   select(-medal)
@@ -281,7 +270,7 @@ ggplot(oly_numb, aes(x = index, y = medals, group = id)) +
   geom_line(alpha = 0.05)
 ```
 
-![](proposal_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+![](proposal_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 ``` r
 oly_numb %>%
@@ -290,7 +279,50 @@ oly_numb %>%
   geom_line(alpha = 0.1)
 ```
 
-![](proposal_files/figure-gfm/unnamed-chunk-1-2.png)<!-- -->
+![](proposal_files/figure-gfm/unnamed-chunk-2-2.png)<!-- -->
+
+``` r
+popular_sports <- olympics %>%
+  count(sport) %>%
+  arrange(desc(n)) %>%
+  head(7)
+
+woo <- left_join(popular_sports, olympics, by = "sport")
+```
+
+``` r
+# which sports are the most common crossovers?
+# does amt of crossovers differ by country
+# heatmap of sports on x and y axis that ppl participate across 
+
+multisport_competitors <- olympics %>%
+  distinct(id, sport) %>%
+  group_by(id) %>%
+  count() %>%
+  arrange(desc(n)) %>%
+  filter(n > 1) %>%
+  left_join(olympics, by = "id")
+
+#multisport_competitors %>%
+#  distinct(name, sport) %>%
+#  pivot_wider(id_cols = "id", names_from = "sport", values_from = "sport") %>%
+#  mutate_all(case_when(
+#    str_detect(., "\\d") ~ .,
+#    str_detect(., "\\w") ~ 1,
+#    TRUE ~ 0))
+```
+
+``` r
+olympics_score %>%
+  group_by(noc, date, medal) %>%
+  summarize(score = sum(medal)) %>%
+  ggplot(aes(x = date, y = score, group = noc)) +
+  geom_line(alpha = .2)
+```
+
+    ## `summarise()` has grouped output by 'noc', 'date'. You can override using the `.groups` argument.
+
+![](proposal_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ## Dataset
 
@@ -304,6 +336,7 @@ information.
 
 The two questions you want to answer.
 
+1.  
 ## Analysis plan
 
 A plan for answering each of the questions including the variables
