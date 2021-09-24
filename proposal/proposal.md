@@ -263,10 +263,8 @@ nationwide economic factors may be associated with trends in countries’
 Olympic performance over time. The external data we have chosen to merge
 in comes from the Maddison Project Database, a compilation of
 researchers’ work estimating economic growth for individual countries
-(Bolt and van Zanden, 2020). The full list of compiled sources for this
-project is visible
-[here](https://ourworldindata.org/grapher/gdp-per-capita-maddison-2020)
-under the “Source” tab.
+([Bolt and van
+Zanden, 2020](https://ourworldindata.org/grapher/gdp-per-capita-maddison-2020)).
 
 We will create a scatterplot with `gdp_per_capita` on the x axis and
 `medals_total` on the y axis. We plan to highlight interesting outliers
