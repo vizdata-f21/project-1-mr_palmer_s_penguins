@@ -120,13 +120,11 @@ Games that were canceled during the World Wars, and the late 1980s
 advent of professional superstar Olympians all potentially provide
 insights into the story told by the data.
 
-Source: TidyTuesday
+#### Sources
 
-<https://github.com/rfordatascience/tidytuesday/tree/master/data/2021#readme7c70d95441aec295a1e92da9d71e2872877d663c>
+[TidyTuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021#readme7c70d95441aec295a1e92da9d71e2872877d663c)
 
-Source: Kaggle
-
-<https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results>
+[Kaggle](https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results)
 
 ## Questions
 
@@ -195,7 +193,7 @@ have smaller differences in ages in the 20-30 age range whereas all
 athletes 40-97, for example, might be grouped together. However, as
 mentioned, this would depend on the distribution of the data.
 
-Like it Plot 1, we will evaluate which of `height`, `weight`, or the
+Like in Plot 1, we will evaluate which of `height`, `weight`, or the
 height:weight ratio provides the most insightful visualization. Ideally,
 the variable we choose in Plot 1 will be the same as in Plot 2; however,
 we understand creating visualizations is an iterative process are open
@@ -203,9 +201,7 @@ to evaluating as we plot.
 
 ### For Question 2
 
-#### Plot 1:
-
-#### Plot 2:
+#### Data wrangling
 
 The original variables we will use to answer this question are `noc`,
 `medal`, `sport` (perhaps `event` if some higher granularity proves
@@ -214,6 +210,10 @@ informative rather than overwhelming), and `year` and `season`. Both
 will require some cleaning in conversion to an accurate variable `date`.
 Many of us are familiar with even recent anomalies in Olympic labeling
 (such as these recent 2020 Summer Olympics, which took place in 2021).
+The exact begin and end dates of each Olympics are not the goal of this
+step. We simply wish to be able to correctly order the games
+chronologically, which may require more information than just the year
+and season in some cases.
 
 Next, we will mutate `medal` from a categorical variable with ‘Gold’,
 ‘Silver’, ‘Bronze’, and NA as outcomes to either a numeric indicator
@@ -236,10 +236,20 @@ this question.
 
 After the above merging and necessary cleaning, we will group the data
 by `country`, `sport`, and `date` to compute a new variable called
-`medals_total`. These steps should allow us to begin an initial approach
-to visualization, for example, by plotting `medals_total` on the y-axis
+`medals_total` by taking the sum of either our medal-won indicator or
+our medal score assigned to differentiate gold, silver and bronze
+victories. These steps should allow us to begin an initial approach to
+visualization.
+
+#### Plot 1:
+
+In our first visualization, we will plot `medals_total` on the y-axis
 and `date` on the x-axis with lines grouped by `country` and faceting by
-`sport`.
+`sport`. We will select just a few sports of interest to compare
+
+#### Plot 2:
+
+### A note on faceting
 
 It is important to note that for several of our proposed plots, we
 mention mapping categorical variables with many levels–such as `country`
