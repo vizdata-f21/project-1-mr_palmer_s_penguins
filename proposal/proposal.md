@@ -216,3 +216,13 @@ by `country`, `sport`, and `date` to compute a new variable called
 to visualization, for example, by plotting `medals_total` on the y-axis
 and `date` on the x-axis with lines grouped by `country` and faceting by
 `sport`.
+
+It is important to note that for several of our proposed plots, we
+mention mapping categorical variables with many levels–such as `country`
+or `sport`–to visualization tools like facetting and `geom_line()`. It
+is crucial to clarify that we will carefully, intentionally choose a
+subset of possible countries or sports to visualize in each of these
+cases (based on population size, medal count, compelling trends, etc.).
+We acknowledge that failing to do so may lead to messy plots that are
+difficult to interpret, and thus will prioritize legibility and meaning
+in our ultimate visualizations.
