@@ -245,18 +245,48 @@ visualization.
 
 In our first visualization, we will plot `medals_total` on the y-axis
 and `date` on the x-axis with lines grouped by `country` and faceting by
-`sport`. We will select just a few sports of interest to compare
+`sport`. We will select just a few sports of interest to compare and use
+selective color mapping for countries of interest and transparency to
+strongly highlight a few countries and make the remaining lines
+indistinguishable in the background. If this technique remains visually
+overwhelming after prototyping our plot, we will filter to select just a
+few countries of interest in each sport and color map only those.
 
 #### Plot 2:
+
+Our second visualization will require historical GDP per capita data by
+country. We are interested in attempting to understand how the
+nationwide economic factors may be associated with trends in countries’
+Olympic performance over time. The external data we have chosen to merge
+in comes from the Maddison Project Database, a compilation of
+researchers’ work estimating economic growth for individual countries
+(Bolt and van Zanden, 2020). The full list of compiled sources for this
+project is visible
+[here](https://ourworldindata.org/grapher/gdp-per-capita-maddison-2020)
+under the “Source” tab.
+
+We will create a scatterplot with `gdp_per_capita` on the x axis and
+`medals_total` on the y axis. We plan to highlight interesting outliers
+with country emojis, and we will facet by `season` only if that reveals
+an interesting difference between the economic indicator-athletic
+performance association. We will also use an iterative approach to
+determine whether selecting one or a few year(s) of interest to maintain
+a one-to-one ratio of points to countries or plotting all the data
+points (one for each country-year combination) will appear more
+informative to the viewer. Alternatively, if we are permitted to produce
+an animated plot and animation is feasible given our other aesthetic
+goals, we will animate the plot with each frame representing a single
+Olympics and year (or Olympics and season if faceting by season proves
+to be uninformative).
 
 ### A note on faceting
 
 It is important to note that for several of our proposed plots, we
 mention mapping categorical variables with many levels–such as `country`
-or `sport`–to visualization tools like facetting and `geom_line()`. It
-is crucial to clarify that we will carefully, intentionally choose a
-subset of possible countries or sports to visualize in each of these
-cases (based on population size, medal count, compelling trends, etc.).
-We acknowledge that failing to do so may lead to messy plots that are
+or `sport`–to visualization tools like faceting and `geom_line()`. It is
+crucial to clarify that we will carefully, intentionally choose a subset
+of possible countries or sports to visualize in each of these cases
+(based on population size, medal count, compelling trends, etc.). We
+acknowledge that failing to do so may lead to messy plots that are
 difficult to interpret, and thus will prioritize legibility and meaning
 in our ultimate visualizations.
