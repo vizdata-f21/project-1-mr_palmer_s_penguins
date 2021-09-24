@@ -3,7 +3,7 @@ title: "Project proposal"
 author: "Mr. Palmer's Penguins"
 output: github_document
 ---
-
+ 
 ```{r load-packages-and-data, message = FALSE, warning = FALSE}
 library(tidyverse)
 
@@ -105,7 +105,7 @@ For our second plot, we will look more closely at how size characteristics have 
 
 The ages in the dataset range from 10 to 97 years old. Therefore, we will plot a histogram and do summary statistics to understand which cutoffs make the most sense given the data. Since athletes tend to be in their mid 20s, we'll likely have smaller differences in ages in the 20-30 age range whereas all athletes 40-97, for example, might be grouped together. However, as mentioned, this would depend on the distribution of the data.
 
-Like in Plot 1, we will evaluate which of `height`, `weight`, or the height:weight ratio provides the most insightful visualization. Ideally, the variable we choose in Plot 1 will be the same as in Plot 2; however, we understand creating visualizations is an iterative process are open to evaluating all options as we plot.
+Like in Plot 1, we will evaluate which of `height`, `weight`, or the `height:weight` ratio provides the most insightful visualization. Ideally, the variable we choose in Plot 1 will be the same as in Plot 2; however, we understand creating visualizations is an iterative process are open to evaluating all options as we plot.
 
 ### For Question 2
 

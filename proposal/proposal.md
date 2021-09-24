@@ -197,10 +197,10 @@ grouped together. However, as mentioned, this would depend on the
 distribution of the data.
 
 Like in Plot 1, we will evaluate which of `height`, `weight`, or the
-height:weight ratio provides the most insightful visualization. Ideally,
-the variable we choose in Plot 1 will be the same as in Plot 2; however,
-we understand creating visualizations is an iterative process are open
-to evaluating all options as we plot.
+`height:weight` ratio provides the most insightful visualization.
+Ideally, the variable we choose in Plot 1 will be the same as in Plot 2;
+however, we understand creating visualizations is an iterative process
+are open to evaluating all options as we plot.
 
 ### For Question 2
 
