@@ -33,6 +33,8 @@ and context about the event (where and when it was held, season, etc.).
 
 The full list of variables are included here and described below:
 
+[codebook](here::here\(\), "/data/olympics_data.csv")
+
 ``` r
 glimpse(olympics)
 ```
@@ -147,41 +149,63 @@ Here is a plan for answering each of the questions:
 
 ### For Question 1
 
-To answer our first question, we will evaluate the variables `height`,
-`weight`, `age`, `sex`, `sport`, and `year`. After looking at the
-dataset, we are interested in exploring the physical characteristics of
-Olympic athletes. We are all used to hearing that these athletes are in
-peak physical condition, but this classification differs by sport and
-has probably changed over the years.
+We are interested in exploring the physical characteristics of Olympic
+athletes. Therefore, to answer our first question, we will visualize the
+variables `height`, `weight`, `age`, `sex`, `sport`, and `year`.
 
-We will start by creating a new variable, `height-weight-ratio`. We are
-interested in exploring the height to weight ratio for different sports
-in the Olympics, as different sports require different body-types for
-success. For example, volleyball and basketball players are usually
-exceptionally tall, while wrestlers are usually shorter and built. We
-will create this variable and use it in our exploration of the data to
-see if we can find anything interesting.
+#### Plot 1:
 
-We now want to see how this ratio and other characteristics, like height
-and weight individually, differ in different sports. We can accomplish
-this by plotting `height` and `weight`, maybe with boxplots, and
-faceting by `sport`. Based on the results, we might pick a few select
-sports to focus in on or group the sports based on common
-characteristics since there are many (probably too many for one plot) to
-facet by. Moreover, we also plan to analyze this information by `sex`
-since characteristics can differ for each division.
+We are all used to hearing that these athletes are in peak physical
+condition, but this classification differs by sport. For example,
+volleyball and basketball players are usually exceptionally tall, while
+wrestlers are usually shorter and built. Therefore, for our first plot,
+we plan to explore how size characteristics (`height`, `weight`, or the
+height:weight ratio) differ by `sport` and `sex`, as different sports
+require different body-types for success. In other words, we plan to
+plot a size characteristic with boxplots by `sex` (since characteristics
+can differ for each division) and faceting by `sport`.
 
-To see how these values have changed over the years, we will then use
-`year` to make time series line plots for these different values. We can
-also facet these plots by `sport` to see if, for example, height of
-athletes has changed more or less over time in one sport as compared to
-another. Another part of the question we may be able to answer pertains
-to the effect of athletes’ age on physical characteristics. We can plot
-`height` and `weight` against `age` as a continuous variable, or we can
-transform `age` into a discrete, factor variable and create boxplots for
-different characteristics at different age levels.
+Since we are unsure which of `height`, `weight`, or the `height:weight`
+ratio will be most telling, we will start by making 3 plots (each with
+one of these on the y-axis) and then select the plot where the trends
+are most insightful. In order to plot the height-weight-ratio, we will
+have to create a new variable.
+
+Based on the results, in addition to narrowing in on a size
+characteristic, we might pick a few select sports to focus in on or
+group the sports based on common characteristics since there are 66
+sports in the dataset.
+
+#### Plot 2:
+
+For our second plot, we will look more closely at how size
+characteristics have changed over time, using `year` to make a time
+series line plots for these different values. In other words, we will
+plot one of the size characteristics (`height`, `weight`, or the
+height:weight ratio) on the y-axis vs. time on the x-axis. Lines will
+connect the observations by `sex`. We might also facet these plots by
+`age` to see if, for example, height of athletes has changed more or
+less over time for younger athletes vs. older athletes. In order to
+facet by `age`, we will have to make `age` a categorical variable by
+setting different cutoffs in which we group observations. The ages in
+the dataset range from 10 to 97 years old. We will plot a histogram and
+do summary statistics to understand which cutoffs make the most sense
+give the data. Since athletes tend to be in their mid 20s, we’ll likely
+have smaller differences in ages in the 20-30 age range whereas all
+athletes 40-97, for example, might be grouped together. However, as
+mentioned, this would depend on the distribution of the data.
+
+Like it Plot 1, we will evaluate which of `height`, `weight`, or the
+height:weight ratio provides the most insightful visualization. Ideally,
+the variable we choose in Plot 1 will be the same as in Plot 2; however,
+we understand creating visualizations is an iterative process are open
+to evaluating as we plot.
 
 ### For Question 2
+
+#### Plot 1:
+
+#### Plot 2:
 
 The original variables we will use to answer this question are `noc`,
 `medal`, `sport` (perhaps `event` if some higher granularity proves
