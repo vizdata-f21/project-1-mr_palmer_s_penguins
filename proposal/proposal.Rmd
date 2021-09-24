@@ -8,7 +8,7 @@ output: github_document
 library(tidyverse)
 
 # load data from tidytuesday site and write to csv in data folder
-readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv') %>%
+readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv") %>%
   write_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
 
 # read data from csv
@@ -61,7 +61,7 @@ We chose this dataset because we think it can provide a lot of good insights int
 
 These data offer many avenues to explore when analyzing, such as medalwinning success on an athlete-level scale, on a country-level scale, or for a particular sport over time, etc. Complementing this variety of potential analysis paradigms is the medley of variable types. Several variable types such as categorical, ordinal, time-series, and ratio are well represented in the data. This also affords us the opportunity to calculate new variables, such as converting the medal variable into a logical medal winner or non-medal winner.
 
-Finally, aside from the properties of the data itself, we chose to analyze data from the Olympic games due to the recency of the 2020/2021 Tokyo Games and the role of the Games in reflecting the global culture of a time period. Historic events like the 1980 Moscow Games that were boycotted by the US and many other countries, the several instances of Games that were cancelled during the World Wars, and the late 1980s advent of professional superstar Olympians all potentially provide insights into the story told by the data.
+Finally, aside from the properties of the data itself, we chose to analyze data from the Olympic games due to the recency of the 2020/2021 Tokyo Games and the role of the Games in reflecting the global culture of a time period. Historic events like the 1980 Moscow Games that were boycotted by the US and many other countries, the several instances of Games that were canceled during the World Wars, and the late 1980s advent of professional superstar Olympians all potentially provide insights into the story told by the data.
 
 Source: TidyTuesday
 

@@ -6,7 +6,7 @@ Mr. Palmer’s Penguins
 library(tidyverse)
 
 # load data from tidytuesday site and write to csv in data folder
-readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv') %>%
+readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv") %>%
   write_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
 
 # read data from csv
@@ -114,7 +114,7 @@ analyze data from the Olympic games due to the recency of the 2020/2021
 Tokyo Games and the role of the Games in reflecting the global culture
 of a time period. Historic events like the 1980 Moscow Games that were
 boycotted by the US and many other countries, the several instances of
-Games that were cancelled during the World Wars, and the late 1980s
+Games that were canceled during the World Wars, and the late 1980s
 advent of professional superstar Olympians all potentially provide
 insights into the story told by the data.
 
