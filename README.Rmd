@@ -21,12 +21,14 @@ Brief introduction to the dataset.
 You may repeat some of the information about the dataset provided in the introduction to the dataset on the TidyTuesday repository, paraphrasing on your own terms.
 Imagine that your project is a standalone document and the grader has no prior knowledge of the dataset.
 
-## Question 1 <- Update title to relate to the question you’re answering
+## Does the optimal build of an Olympic athlete differ by sex or by sport? How have the trends in height and weight of Olympic athletes evolved over time?
 
 ### Introduction
 
 (1-2 paragraphs)
 Introduction to the question and what parts of the dataset are necessary to answer the question. Also discuss why you’re interested in this question.
+
+We are interested in exploring the physical characteristics of Olympic athletes. The Olympic Games is unique in showcasing a variety of disciplines and the body types of athletes who succeed at them. For example, imagine a typical male Olympic wrestler, versus a typical female gymnast. Pretty disparate builds, right? Even within one sport, say gymnastics, we hypothesize that there may be different optimal heights and weights for successful athletes of different genders  Therefore, to answer our first question, we will visualize the variables `height`, `weight`, `age`, `sex`, `sport`, and `year`.
 
 ### Approach
 
@@ -35,55 +37,43 @@ Describe what types of plots you are going to make to address your question.
 For each plot, provide a clear explanation as to why this plot (e.g. boxplot, barplot, histogram, etc.) is best for providing the information you are asking about. 
 The two plots should be of different types, and at least one of the two plots needs to use either color mapping or facets.
 
+
+For our first plot, we plan to use boxplots to plot the distribution of a size characteristic by `sex` (since characteristics tend to differ among males and females) and faceting by `sport`. We are unsure which of the `height`, `weight`, `height / weight`, or `bmi` ratio will be most telling when examined across sexes and sports. We will start by making 4 plots (each with one of these on the y-axis) and then select the plot where the trends are most insightful.
+
+Two of these variables require new calculations in the data wrangling step. In order to plot the height-weight-ratio, we will have to create two new calculated columns. First, a `height_weight_ratio` column that simply divides an athlete's `height` by their `weight`, and a more complicated `BMI` column that represents an existing metric--[BMI](https://en.wikipedia.org/wiki/Body_mass_index)--that integrates height and weight into a single measure. . 
+
+Based on the results from these preliminary plots, in addition to narrowing in on a size characteristic, we might pick a few select sports to focus in on (i.e. most popular sports) or group the sports based on common characteristics (ex: contact vs. non-contact, etc.) since there are 66 sports in the dataset.
+
 ### Analysis
 
-``` {r evan-from-9-16-meeting}
-## Evan
+``` {r generate-plot-one}
 
-# Get vector of sports to keep: ie. those that have at least 5 observations per gender
-sports_to_keep <- olympics %>%
-  group_by(sport, sex) %>%
-  summarise(n_per_gender = n()) %>%
-  filter(n_per_gender > 5) %>%
-  summarise(genders_per_sport = n()) %>%
-  filter(genders_per_sport == 2) %>%
-  select(sport) %>%
-  pull()
+# Create new calculated variables to represent physical build
+olympics <- olympics %>%
+  mutate(height_weight_ratio = height / weight,
+         BMI = 10000 * weight / (height * height))
 
-# Remove all observations from data frame except those from the desired sports we identified above. We also need to remove Croquet and Art Competitions, as those data do not have height or weight measurements.
-olympics_evan <- olympics %>%
-  filter(sport %in% sports_to_keep) %>%
-  filter(!(sport %in% c("Croquet", "Art Competitions")))
+# Create plot to examine BMIs and how they vary between sexes, then comparing these trends across sports
+ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
+  geom_boxplot()
 
-# Also im just going to keep summer sports to try to reduce visual overload
-#olympics_evan <- olympics_evan %>%
-  #filter(season == "Summer")
+# I tried all 4, and i like BMI the best. As well as these sports:
+# wrestling, weightlifting, judo (these three have weight classes as it's very apparent in the spread)
+# boxing (they also have weight classes, but surprisingly, there is no difference? what?)
+# gymnastics, trampolining (our original hypothesis; the boxes don't overlap! also the lower range of the female being like 12 makes me sad), 
+# shooting, archery (very wide range, makes sense as you body type doesn't really matter as much as a steady hand. shooting showing more disparity than archery, as well)
+# rowing, athletics (between coxswains in rowing, then sprinting vs throwing in althetics, no surprise that these are the top variables!)
 
-# Create new needed variables
-olympics_evan <- olympics_evan %>%
-  mutate(medalwinner = if_else(is.na(medal), FALSE, TRUE),
-         h_to_w = height / weight)
+# create helper vector of these sports
+chosen_sports <- c("Wrestling", "Weightlifting", "Judo", "Boxing", "Gymnastics", "Trampolining", "Shooting", "Archery", "Rowing", "Athletics")
 
-# Create plot to examine height to weight ratios and how they vary between sexes and medalwinners and non-medalwinners, and then comparing these trends across sports
-ggplot(olympics_evan, mapping = aes(x = medalwinner, y = h_to_w)) +
-  geom_boxplot(aes(color = sex)) +
-  facet_wrap(vars(sport))
-
-#TODOS: see what's going on with ice hockey (looks like only males, and only medalwinners) and figure skating (looks like only medalwinners, but both sexes are still represented.)
-
+# try plotting again with just these sports
 olympics %>%
-  filter(sport == "Beach Volleyball" | sport == "Volleyball") %>%
-  mutate(h_to_w = height / weight) %>%
-  group_by(sex, year) %>%
-  summarise(mean_h_to_w = mean(h_to_w, na.rm = TRUE),
-            mean_height = mean(height, na.rm = TRUE),
-            mean_weight = mean(weight, na.rm = TRUE)) %>%
-  ggplot(mapping = aes(x = year, group = sex, linetype = sex)) +
-    geom_line(aes(y = mean_h_to_w), color = "purple") +
-    geom_line(aes(y = mean_height), color = "blue") +
-    geom_line(aes(y = mean_weight), color = "green") +
-    geom_vline(xintercept = c(1984, 1992), color = "red")
-
+  filter(sport %in% chosen_sports) %>%
+  distinct(id, .keep_all = TRUE) %>%
+  mutate(sport = factor(sport, levels = rev(chosen_sports))) %>%
+ggplot(mapping = aes(y = sport, x = BMI, color = sex)) +
+  geom_boxplot()
 ```
 
 (2-3 code blocks, 2 figures, text/code comments as needed)
