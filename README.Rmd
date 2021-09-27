@@ -6,10 +6,12 @@ output: github_document
 
 ```{r load-packages, echo = FALSE}
 # load packages here
+library(tidyverse)
 ```
 
 ```{r load-data, echo = FALSE}
 # load data here
+olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
 ```
 
 ## Introduction
