@@ -116,6 +116,12 @@ In this section, provide the code that generates your plots. Use scale functions
 You are welcome to use theme functions to customize the appearance of your plot, but you are not required to do so.
 All plots must be made with ggplot2. Do not use base R or lattice plotting functions.
 
+```{r}
+
+```
+
+In our first visualization, we will plot `medals_total` on the y-axis and `date` on the x-axis with lines grouped by `country` and faceting by `sport`. We will select just a few sports of interest to compare and use selective color mapping for countries of interest and transparency to strongly highlight a few countries and make the remaining lines indistinguishable in the background. If this technique remains visually overwhelming after prototyping our plot, we will filter to select just a few countries of interest in each sport and color map only those.
+
 ### Discussion
 
 (1-3 paragraphs)
