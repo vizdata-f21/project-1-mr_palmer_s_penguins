@@ -2,9 +2,6 @@ Project title
 ================
 by Team name
 
-    ## Warning in system("timedatectl", intern = TRUE): running command 'timedatectl'
-    ## had status 1
-
     ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
 
     ## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
@@ -15,6 +12,10 @@ by Team name
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
+
+    ## Loading required package: sysfonts
+
+    ## Loading required package: showtextdb
 
     ## Rows: 271116 Columns: 15
 
@@ -92,16 +93,7 @@ olympics <- olympics %>%
   mutate(height_weight_ratio = height / weight,
          BMI = 10000 * weight / (height * height))
 
-# Create plot to examine BMIs and how they vary between sexes, then comparing these trends across sports
-ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
-  geom_boxplot()
-```
 
-    ## Warning: Removed 64263 rows containing non-finite values (stat_boxplot).
-
-![](README_files/figure-gfm/generate-plot-one-1.png)<!-- -->
-
-``` r
 # I tried all 4, and i like BMI the best. As well as these sports:
 # wrestling, weightlifting, judo (these three have weight classes as it's very apparent in the spread)
 # boxing (they also have weight classes, but surprisingly, there is no difference? what?)
@@ -112,6 +104,18 @@ ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
 # create helper vector of these sports
 chosen_sports <- c("Wrestling", "Weightlifting", "Judo", "Boxing", "Gymnastics", "Trampolining", "Shooting", "Archery", "Rowing", "Athletics")
 
+# load Olympic font
+font_add_google(name = "Oswald")
+showtext_auto()
+```
+
+I found a citation for the Tokyo 2020 Olympics logo font
+[here](https://www.reddit.com/r/identifythisfont/comments/4ig8ua/font_used_on_the_tokyo_2020_logo/)
+and was pointed to an open-source alternative
+[here.](https://graphicdesign.stackexchange.com/questions/7178/is-there-a-din-font-free-alternative).
+I also got the hex code manually from that logo.
+
+``` r
 # try plotting again with just these sports, remember to keep each athlete only once!
 olympics %>%
   filter(sport %in% chosen_sports) %>%
@@ -127,19 +131,24 @@ olympics %>%
 ggplot(mapping = aes(y = sport, x = BMI, color = sex)) +
   geom_boxplot() +
   labs(x = "Body Mass Index",
-       y = "Sport",
+       y = NULL,
        color = "Sex",
-       title = "Sport vs Body Mass Index Distribution",
-       subtitle = "Of selected Olympic sports from 1912-2020",,
-       caption = "Source: Sports Reference & OlympStats\nAccessed from kaggle.com") +
+       title = "Sex vs Body Mass Index Distribution",
+       subtitle = "Of athletes competing in selected Olympic sports from 1912-2020",,
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com\nVisualization: Mr. Palmer's Penguins") +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme(strip.background = element_blank(),
-        strip.text.y = element_blank())
+        strip.text.y = element_blank(),
+        plot.title = element_text(family = "Oswald", color = "#092260"),
+        plot.caption = element_text(family = "Oswald", color = "#092260"),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260"),
+        axis.text.x = element_text(family = "Oswald", color = "#092260"),
+        legend.text = element_text(family = "Oswald", color = "#092260"))
 ```
 
     ## Warning: Removed 14145 rows containing non-finite values (stat_boxplot).
 
-![](README_files/figure-gfm/generate-plot-one-2.png)<!-- -->
+![](README_files/figure-gfm/fonts-and-plot-one-1.png)<!-- -->
 
 (2-3 code blocks, 2 figures, text/code comments as needed) In this
 section, provide the code that generates your plots. Use scale functions

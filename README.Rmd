@@ -7,6 +7,7 @@ output: github_document
 ```{r load-packages, echo = FALSE}
 # load packages here
 library(tidyverse)
+library(showtext) # cool fonts
 ```
 
 ```{r load-data, echo = FALSE}
@@ -46,16 +47,13 @@ Based on the results from these preliminary plots, in addition to narrowing in o
 
 ### Analysis
 
-``` {r generate-plot-one}
+``` {r wrangling-plot-one}
 
 # Create new calculated variables to represent physical build
 olympics <- olympics %>%
   mutate(height_weight_ratio = height / weight,
          BMI = 10000 * weight / (height * height))
 
-# Create plot to examine BMIs and how they vary between sexes, then comparing these trends across sports
-ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
-  geom_boxplot()
 
 # I tried all 4, and i like BMI the best. As well as these sports:
 # wrestling, weightlifting, judo (these three have weight classes as it's very apparent in the spread)
@@ -67,6 +65,14 @@ ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
 # create helper vector of these sports
 chosen_sports <- c("Wrestling", "Weightlifting", "Judo", "Boxing", "Gymnastics", "Trampolining", "Shooting", "Archery", "Rowing", "Athletics")
 
+# load Olympic font
+font_add_google(name = "Oswald")
+showtext_auto()
+```
+
+I found a citation for the Tokyo 2020 Olympics logo font [here](https://www.reddit.com/r/identifythisfont/comments/4ig8ua/font_used_on_the_tokyo_2020_logo/) and was pointed to an open-source alternative [here.](https://graphicdesign.stackexchange.com/questions/7178/is-there-a-din-font-free-alternative). I also got the hex code manually from that logo. 
+
+``` {r fonts-and-plot-one}
 # try plotting again with just these sports, remember to keep each athlete only once!
 olympics %>%
   filter(sport %in% chosen_sports) %>%
@@ -82,14 +88,19 @@ olympics %>%
 ggplot(mapping = aes(y = sport, x = BMI, color = sex)) +
   geom_boxplot() +
   labs(x = "Body Mass Index",
-       y = "Sport",
+       y = NULL,
        color = "Sex",
-       title = "Sport vs Body Mass Index Distribution",
-       subtitle = "Of selected Olympic sports from 1912-2020",,
-       caption = "Source: Sports Reference & OlympStats\nAccessed from kaggle.com") +
+       title = "Sex vs Body Mass Index Distribution",
+       subtitle = "Of athletes competing in selected Olympic sports from 1912-2020",,
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com\nVisualization: Mr. Palmer's Penguins") +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme(strip.background = element_blank(),
-        strip.text.y = element_blank())
+        strip.text.y = element_blank(),
+        plot.title = element_text(family = "Oswald", color = "#092260"),
+        plot.caption = element_text(family = "Oswald", color = "#092260"),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260"),
+        axis.text.x = element_text(family = "Oswald", color = "#092260"),
+        legend.text = element_text(family = "Oswald", color = "#092260"))
   
 ```
 
