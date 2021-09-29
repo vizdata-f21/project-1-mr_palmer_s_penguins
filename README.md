@@ -1,17 +1,6 @@
 Project title
 ================
-by Team name
-
-    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-
-    ## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-    ## ✓ tibble  3.1.4     ✓ dplyr   1.0.7
-    ## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
-    ## ✓ readr   2.0.1     ✓ forcats 0.5.1
-
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## x dplyr::filter() masks stats::filter()
-    ## x dplyr::lag()    masks stats::lag()
+by Mr. Palmer’s Penguins
 
     ## Loading required package: sysfonts
 
@@ -102,7 +91,7 @@ olympics <- olympics %>%
 # rowing, athletics (between coxswains in rowing, then sprinting vs throwing in althetics, no surprise that these are the top variables!)
 
 # create helper vector of these sports
-chosen_sports <- c("Wrestling", "Weightlifting", "Judo", "Boxing", "Gymnastics", "Trampolining", "Shooting", "Archery", "Rowing", "Athletics")
+chosen_sports <- c("Boxing", "Judo", "Weightlifting", "Wrestling", "Gymnastics", "Trampolining", "Archery", "Shooting", "Athletics", "Rowing")
 
 # load Olympic font
 font_add_google(name = "Oswald")
@@ -112,17 +101,20 @@ showtext_auto()
 I found a citation for the Tokyo 2020 Olympics logo font
 [here](https://www.reddit.com/r/identifythisfont/comments/4ig8ua/font_used_on_the_tokyo_2020_logo/)
 and was pointed to an open-source alternative
-[here.](https://graphicdesign.stackexchange.com/questions/7178/is-there-a-din-font-free-alternative).
+[here](https://graphicdesign.stackexchange.com/questions/7178/is-there-a-din-font-free-alternative).
 I also got the hex code manually from that logo.
+
+I chose the hex codes for my favorite gender color mapping from
+Telegraph 2018 [here](https://blog.datawrapper.de/gendercolor/).
 
 ``` r
 # try plotting again with just these sports, remember to keep each athlete only once!
 olympics %>%
   filter(sport %in% chosen_sports) %>%
   mutate(category = case_when(
-    sport %in% c("Wrestling", "Weightlifting", "Judo", "Boxing") ~ "weightclass",
+    sport %in% c("Boxing", "Judo", "Weightlifting", "Wrestling") ~ "weightclass",
     sport %in% c("Gymnastics", "Trampolining") ~ "lightweight",
-    sport %in% c("Shooting", "Archery") ~ "coordination",
+    sport %in% c("Archery", "Shooting") ~ "coordination",
     TRUE ~ "diverse"
   )) %>%
   distinct(id, .keep_all = TRUE) %>%
@@ -136,17 +128,24 @@ ggplot(mapping = aes(y = sport, x = BMI, color = sex)) +
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "Of athletes competing in selected Olympic sports from 1912-2020",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com\nVisualization: Mr. Palmer's Penguins") +
+  scale_color_manual(values = c("#E1AA7D", "#B6D094")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
+  theme_minimal() +
   theme(strip.background = element_blank(),
         strip.text.y = element_blank(),
         plot.title = element_text(family = "Oswald", color = "#092260"),
         plot.caption = element_text(family = "Oswald", color = "#092260"),
         plot.subtitle = element_text(family = "Oswald", color = "#092260"),
         axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        legend.text = element_text(family = "Oswald", color = "#092260"))
+        axis.title.x = element_text(family = "Oswald", color = "#092260"),
+        axis.text.y = element_text(family = "Oswald", color = "#092260"),
+        legend.text = element_text(family = "Oswald", color = "#092260", size = 11),
+        legend.title = element_blank(),
+        legend.position = c(0.82, 0.88),
+        legend.direction = "horizontal",
+        legend.background = element_rect(size = 0.3),
+        legend.key.size = unit(0.5, "cm"))
 ```
-
-    ## Warning: Removed 14145 rows containing non-finite values (stat_boxplot).
 
 ![](README_files/figure-gfm/fonts-and-plot-one-1.png)<!-- -->
 
