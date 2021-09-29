@@ -130,8 +130,11 @@ ggplot(mapping = aes(y = sport, x = BMI, color = sex)) +
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
   scale_color_manual(values = c("#E1AA7D", "#B6D094")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
+  theme_minimal() +
   theme(strip.background = element_blank(),
         strip.text.y = element_blank(),
+        #panel.border = element_rect(size = 0.3, fill = NA),
+        panel.spacing.y = unit(0.4, "cm"),
         plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
         plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
         plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
@@ -146,7 +149,7 @@ ggplot(mapping = aes(y = sport, x = BMI, color = sex)) +
         legend.key.size = unit(0.5, "cm"))
 ```
 
-![](README_files/figure-gfm/fonts-and-plot-one-1.png)<!-- -->
+<img src="README_files/figure-gfm/fonts-and-plot-one-1.png" width="80%" />
 
 (2-3 code blocks, 2 figures, text/code comments as needed) In this
 section, provide the code that generates your plots. Use scale functions
