@@ -121,25 +121,24 @@ olympics %>%
   mutate(sport = factor(sport, levels = rev(chosen_sports)),
          sex = factor(sex, labels = c("Female", "Male"))) %>%
 ggplot(mapping = aes(y = sport, x = BMI, color = sex)) +
-  geom_boxplot() +
-  labs(x = "Body Mass Index",
+  geom_boxplot(position = position_dodge2(10)) +
+  labs(x = "Body Mass Index (kg/m^2)",
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "Of athletes competing in selected Olympic sports from 1912-2020",,
-       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com\nVisualization: Mr. Palmer's Penguins") +
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
   scale_color_manual(values = c("#E1AA7D", "#B6D094")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
-  theme_minimal() +
   theme(strip.background = element_blank(),
         strip.text.y = element_blank(),
-        plot.title = element_text(family = "Oswald", color = "#092260"),
-        plot.caption = element_text(family = "Oswald", color = "#092260"),
-        plot.subtitle = element_text(family = "Oswald", color = "#092260"),
+        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
         axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_text(family = "Oswald", color = "#092260"),
+        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
         axis.text.y = element_text(family = "Oswald", color = "#092260"),
-        legend.text = element_text(family = "Oswald", color = "#092260", size = 11),
+        legend.text = element_text(family = "Oswald", color = "#092260", size = 9),
         legend.title = element_blank(),
         legend.position = c(0.82, 0.88),
         legend.direction = "horizontal",
