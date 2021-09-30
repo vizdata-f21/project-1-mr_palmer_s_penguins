@@ -2,21 +2,6 @@ Project title
 ================
 by Mr. Palmer’s Penguins
 
-    ## Loading required package: sysfonts
-
-    ## Loading required package: showtextdb
-
-    ## Rows: 271116 Columns: 15
-
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr (10): name, sex, team, noc, games, season, city, sport, event, medal
-    ## dbl  (5): id, age, height, weight, year
-
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
 ## Introduction
 
 (1-2 paragraphs) Brief introduction to the dataset. You may repeat some
@@ -82,45 +67,198 @@ olympics <- olympics %>%
   mutate(height_weight_ratio = height / weight,
          BMI = 10000 * weight / (height * height))
 
-
-# I tried all 4, and i like BMI the best. As well as these sports:
-# wrestling, weightlifting, judo (these three have weight classes as it's very apparent in the spread)
-# boxing (they also have weight classes, but surprisingly, there is no difference? what?)
-# gymnastics, trampolining (our original hypothesis; the boxes don't overlap! also the lower range of the female being like 12 makes me sad), 
-# shooting, archery (very wide range, makes sense as you body type doesn't really matter as much as a steady hand. shooting showing more disparity than archery, as well)
-# rowing, athletics (between coxswains in rowing, then sprinting vs throwing in althetics, no surprise that these are the top variables!)
-
-# create helper vector of these sports
-chosen_sports <- c("Boxing", "Judo", "Weightlifting", "Wrestling", "Gymnastics", "Trampolining", "Archery", "Shooting", "Athletics", "Rowing")
-
 # load Olympic font
 font_add_google(name = "Oswald")
 showtext_auto()
 ```
 
-I found a citation for the Tokyo 2020 Olympics logo font
-[here](https://www.reddit.com/r/identifythisfont/comments/4ig8ua/font_used_on_the_tokyo_2020_logo/)
-and was pointed to an open-source alternative
-[here](https://graphicdesign.stackexchange.com/questions/7178/is-there-a-din-font-free-alternative).
-I also got the hex code manually from that logo.
-
-I chose the hex codes for my favorite gender color mapping from
-Telegraph 2018 [here](https://blog.datawrapper.de/gendercolor/).
+After examining each of `height`, `weight`, `height_weight_ratio`, and
+`BMI`, we have chosen to proceed with `BMI` as our size characteristic
+for this plot, as the visualizations were the most accessible and
+intuitive to interpret. After examining the plot displaying the `BMI`
+for all sports, we are choosing a few select groups of sports to
+include. The next step is to create separate dataframes for each of
+these categories. We also want to represent each athlete once on the
+plot, so we will have to use `distinct()`.
 
 ``` r
-# try plotting again with just these sports, remember to keep each athlete only once!
-olympics %>%
-  filter(sport %in% chosen_sports) %>%
+# create variable to represent category of sport
+# keep only one observation per athlete
+olympics <- olympics %>%
+    distinct(id, .keep_all = TRUE) %>%
+  mutate(sex = factor(sex, labels = c("Female", "Male"))) %>%
+  filter(sport %in% c("Boxing", "Judo", "Weightlifting", "Wrestling", "Gymnastics", "Trampolining", "Archery", "Shooting", "Athletics", "Rowing")) %>%
   mutate(category = case_when(
-    sport %in% c("Boxing", "Judo", "Weightlifting", "Wrestling") ~ "weightclass",
-    sport %in% c("Gymnastics", "Trampolining") ~ "lightweight",
-    sport %in% c("Archery", "Shooting") ~ "coordination",
-    TRUE ~ "diverse"
-  )) %>%
-  distinct(id, .keep_all = TRUE) %>%
-  mutate(sport = factor(sport, levels = rev(chosen_sports)),
-         sex = factor(sex, labels = c("Female", "Male"))) %>%
-ggplot(mapping = aes(y = sport, x = BMI, color = sex)) +
+                    sport %in% c("Boxing", "Judo", "Weightlifting", "Wrestling") ~ "weightclass",
+                    sport %in% c("Gymnastics", "Trampolining") ~ "acrobatic",
+                    sport %in% c("Archery", "Shooting") ~ "coordination",
+                    TRUE ~ "diverse"),
+        category = factor(category, levels = c("acrobatic", "diverse", "coordination", "weightclass")))
+
+# create separate dataframes for each of these categories
+olympics_weightclass <- olympics %>%
+  filter(category == "weightclass")
+
+olympics_coordination <- olympics %>%
+  filter(category == "coordination")
+
+olympics_diverse <- olympics %>%
+  filter(category == "diverse")
+
+olympics_acrobatic <- olympics %>%
+  filter(category == "acrobatic")
+```
+
+We are now ready to create a separate plot for each sport category. We
+will also silence messages which indicate that rows with NA have been
+dropped from the dataframe when creating the boxplots.
+
+``` r
+ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = sex)) +
+  geom_boxplot(position = position_dodge2(10)) +
+  labs(x = "Body Mass Index (kg/m^2)",
+       y = NULL,
+       color = "Sex",
+       title = "Sex vs Body Mass Index Distribution",
+       subtitle = "Of athletes competing in weightclass-based Olympic sports",,
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  facet_grid(category ~ ., scales = "free_y", space = "free") +
+  theme_minimal() +
+  theme(strip.background = element_blank(),
+        strip.text.y = element_blank(),
+        panel.spacing.y = unit(0.4, "cm"),
+        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+        axis.text.x = element_text(family = "Oswald", color = "#092260"),
+        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
+        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+        legend.title = element_blank(),
+        legend.position = c(0.9, 0.97),
+        legend.background = element_rect(size = 0.3),
+        legend.margin = margin(1, 5, 5, 5),
+        legend.key.size = unit(0.5, "cm"))
+```
+
+    ## Warning: Removed 4166 rows containing non-finite values (stat_boxplot).
+
+<img src="README_files/figure-gfm/plot-weightclass-1.png" width="80%" />
+
+``` r
+ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex)) +
+  geom_boxplot(position = position_dodge2(10)) +
+  labs(x = "Body Mass Index (kg/m^2)",
+       y = NULL,
+       color = "Sex",
+       title = "Sex vs Body Mass Index Distribution",
+       subtitle = "Of athletes competing in coordination-based Olympic sports",,
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  facet_grid(category ~ ., scales = "free_y", space = "free") +
+  theme_minimal() +
+  theme(strip.background = element_blank(),
+        strip.text.y = element_blank(),
+        panel.spacing.y = unit(0.4, "cm"),
+        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+        axis.text.x = element_text(family = "Oswald", color = "#092260"),
+        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
+        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+        legend.title = element_blank(),
+        legend.position = c(0.9, 0.97),
+        legend.background = element_rect(size = 0.3),
+        legend.margin = margin(1, 5, 5, 5),
+        legend.key.size = unit(0.5, "cm"))
+```
+
+    ## Warning: Removed 1874 rows containing non-finite values (stat_boxplot).
+
+<img src="README_files/figure-gfm/plot-coordination-1.png" width="80%" />
+
+``` r
+ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
+  geom_boxplot(position = position_dodge2(10)) +
+  labs(x = "Body Mass Index (kg/m^2)",
+       y = NULL,
+       color = "Sex",
+       title = "Sex vs Body Mass Index Distribution",
+       subtitle = "Of athletes competing in Olympic sports which encompass many skills",,
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  facet_grid(category ~ ., scales = "free_y", space = "free") +
+  theme_minimal() +
+  theme(strip.background = element_blank(),
+        strip.text.y = element_blank(),
+        panel.spacing.y = unit(0.4, "cm"),
+        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+        axis.text.x = element_text(family = "Oswald", color = "#092260"),
+        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
+        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+        legend.title = element_blank(),
+        legend.position = c(0.9, 0.9),
+        legend.background = element_rect(size = 0.3),
+        legend.margin = margin(1, 5, 5, 5),
+        legend.key.size = unit(0.5, "cm"))
+```
+
+    ## Warning: Removed 6082 rows containing non-finite values (stat_boxplot).
+
+<img src="README_files/figure-gfm/plot-diverse-1.png" width="80%" />
+
+``` r
+ggplot(olympics_acrobatic, mapping = aes(y = sport, x = BMI, color = sex)) +
+  geom_boxplot(position = position_dodge2(10)) +
+  labs(x = "Body Mass Index (kg/m^2)",
+       y = NULL,
+       color = "Sex",
+       title = "Sex vs Body Mass Index Distribution",
+       subtitle = "Of athletes competing in acrobatic Olympic sports",,
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  facet_grid(category ~ ., scales = "free_y", space = "free") +
+  theme_minimal() +
+  theme(strip.background = element_blank(),
+        strip.text.y = element_blank(),
+        panel.spacing.y = unit(0.4, "cm"),
+        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+        axis.text.x = element_text(family = "Oswald", color = "#092260"),
+        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
+        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+        legend.title = element_blank(),
+        legend.position = c(0.9, 0.97),
+        legend.background = element_rect(size = 0.3),
+        legend.margin = margin(1, 5, 5, 5),
+        legend.key.size = unit(0.5, "cm"))
+```
+
+    ## Warning: Removed 1944 rows containing non-finite values (stat_boxplot).
+
+<img src="README_files/figure-gfm/plot-acrobatic-1.png" width="80%" />
+
+We found a citation for the Tokyo 2020 Olympics logo font
+[here](https://www.reddit.com/r/identifythisfont/comments/4ig8ua/font_used_on_the_tokyo_2020_logo/)
+and were pointed to an open-source alternative
+[here](https://graphicdesign.stackexchange.com/questions/7178/is-there-a-din-font-free-alternative).
+We got the hex code used in plot text manually from that logo source. We
+chose the hex codes for our favorite gender color mapping from Telegraph
+2018 [here](https://blog.datawrapper.de/gendercolor/).
+
+We can now visualize these groups on the same plot, to get a better
+sense of broader variability in size characteristics among an array of
+Olympic sports.
+
+``` r
+ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
   labs(x = "Body Mass Index (kg/m^2)",
        y = NULL,
@@ -128,12 +266,11 @@ ggplot(mapping = aes(y = sport, x = BMI, color = sex)) +
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "Of athletes competing in selected Olympic sports from 1912-2020",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#E1AA7D", "#B6D094")) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
         strip.text.y = element_blank(),
-        #panel.border = element_rect(size = 0.3, fill = NA),
         panel.spacing.y = unit(0.4, "cm"),
         plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
         plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
@@ -141,13 +278,15 @@ ggplot(mapping = aes(y = sport, x = BMI, color = sex)) +
         axis.text.x = element_text(family = "Oswald", color = "#092260"),
         axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
         axis.text.y = element_text(family = "Oswald", color = "#092260"),
-        legend.text = element_text(family = "Oswald", color = "#092260", size = 9),
+        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.title = element_blank(),
-        legend.position = c(0.82, 0.88),
-        legend.direction = "horizontal",
+        legend.position = c(0.9, 0.97),
         legend.background = element_rect(size = 0.3),
+        legend.margin = margin(1, 5, 5, 5),
         legend.key.size = unit(0.5, "cm"))
 ```
+
+    ## Warning: Removed 14066 rows containing non-finite values (stat_boxplot).
 
 <img src="README_files/figure-gfm/fonts-and-plot-one-1.png" width="80%" />
 
@@ -163,6 +302,31 @@ R or lattice plotting functions.
 (1-3 paragraphs) In the Discussion section, interpret the results of
 your analysis. Identify any trends revealed (or not revealed) by the
 plots. Speculate about why the data looks the way it does.
+
+In all plots, men typically have a higher-centered distribution of `BMI`
+than women in the same sport, but other trends are more apparent by
+`category`. In the first plot, which includes wrestling, weightlifting,
+judo, and boxing, we see a strong right skew in most distributions. We
+interpret this as a reflection of the weight classes present in those
+sports, with many participants entering in lower weight classes, giving
+a lower center, but a non-insignificant number of athletes with BMIs
+higher than 30. However, there are fewer at these high BMIs, possibly
+due to the difficulty in maintaining athletic competitiveness at that
+proportion. Shooting and archery also have generally higher BMIs than
+other sports, and again a right-skew is observed in the distributions.
+This reflects those sports’ focus on hand-eye coordination, and thus
+athlete body type or height or weight are more variable.
+
+The next group of sports, Athletics and Rowing, feature distributions
+with large variability on both sides. We interpret this as illustrating
+the diversity of body types considered desirable in this sports: from
+slender, lithe coxswains and sprinters to heavier, more powerful rowers
+and throwers. Finally, the largest disparities between `sex` in a
+particular sport are observed in Gymnastics and Trampoline. Here, we
+speculate that the female gymnastics disciplines favor petite, nimble
+athletes, as opposed to the more upper-body strength oriented male
+apparatuses, which contribute to a higher average BMI for male Olympic
+gymnasts.
 
 ## Question 2 \<- Update title to relate to the question you’re answering
 
