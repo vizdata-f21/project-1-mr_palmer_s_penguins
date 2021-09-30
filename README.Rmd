@@ -8,6 +8,8 @@ output: github_document
 # load packages here
 library(lubridate)
 library(countrycode)
+library(gganimate)
+library(gifski)
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(showtext)) # cool fonts
 suppressPackageStartupMessages(library(magrittr))
@@ -407,24 +409,48 @@ In our first visualization, we will plot `medals_total` on the y-axis and `date`
 gdp <- read_csv("data/gdp-per-capita-maddison-2020.csv")
 
 gdp %<>%
-  janitor::clean_names()
+  janitor::clean_names() %>%
+  mutate(entity = case_when(
+    entity == "United States" ~ "USA",
+    entity == "United Kingdom" ~ "UK",
+    entity == "Congo" ~ "Republic of Congo",
+    entity == "Democratic Republic of Congo" ~ "Democratic Republic of the Congo",
+    entity == "Cote d'Ivoire" ~ "Ivory Coast",
+    entity == "Trinidad and Tobago" ~ "Trinidad",
+    entity == "North Macedonia" ~ "Macedonia",
+    entity == "Czechia" ~ "Czech Republic",
+    TRUE ~ entity
+  ))
 ```
 
 ```{r}
 olympics_gdp <- olympics %>%
-  group_by(region, date) %>%
+  group_by(region, date, season, flag) %>%
   summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop") %>%
   rename(entity = region) %>%
   mutate(year = year(date)) %>%
   left_join(gdp, by = c("entity", "year"))
 ```
 
-```{r}
+```{r dev = "ragg_png"}
 olympics_gdp %>%
-  filter(year >= 2010) %>%
-  ggplot(aes(x = gdp_per_capita, total_score)) +
-  geom_point() +
-  facet_wrap(~date)
+  filter(!is.na(gdp_per_capita), season == "Winter") %>%
+  ggplot(aes(x = gdp_per_capita, y = total_winners)) +
+  geom_point(alpha = .3) +
+  geom_text(aes(label = flag))
+```
+
+
+```{r}
+p <- olympics_gdp %>%
+  filter(!is.na(gdp_per_capita), season == "Winter") %>%
+  ggplot(aes(x = gdp_per_capita, y = total_score)) +
+  geom_point(alpha = .3) +
+  transition_time(year)
+  # ease_aes('linear')
+ # view_follow(fixed_y = TRUE)
+
+animate(p, renderer = gifski_renderer())
 ```
 
 ### Discussion
