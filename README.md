@@ -297,6 +297,8 @@ functions to customize the appearance of your plot, but you are not
 required to do so. All plots must be made with ggplot2. Do not use base
 R or lattice plotting functions.
 
+Plot 2 (Drew):
+
 ### Discussion
 
 (1-3 paragraphs) In the Discussion section, interpret the results of
