@@ -20,16 +20,6 @@ by Mr. Palmer’s Penguins
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
-    ## Rows: 230 Columns: 3
-
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr (3): NOC, region, notes
-
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
 ## Introduction
 
 The set, which includes 15 variables and 271116 observations, provides
@@ -419,9 +409,10 @@ olympics %>%
 
     ## `summarise()` has grouped output by 'year'. You can override using the `.groups` argument.
 
-<img src="README_files/figure-gfm/age-plot-1.png" width="80%" /> The
-mean was used, rather than the median, of `age` as this better captures
-the range of ages of athletes for a given year.
+<img src="README_files/figure-gfm/age-plot-1.png" width="80%" />
+
+The mean was used, rather than the median, of `age` as this better
+captures the range of ages of athletes for a given year.
 
 ### Discussion
 
@@ -526,7 +517,36 @@ section, provide the code that generates your plots. Use scale functions
 to provide nice axis labels and guides. You are welcome to use theme
 functions to customize the appearance of your plot, but you are not
 required to do so. All plots must be made with ggplot2. Do not use base
-R or lattice plotting functions.
+R or lattice plotting functions. \#\#\#\# Plot 1
+
+``` r
+olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
+```
+
+    ## Rows: 271116 Columns: 15
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (10): name, sex, team, noc, games, season, city, sport, event, medal
+    ## dbl  (5): id, age, height, weight, year
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+noc_regions <- read_csv(file = paste0(here::here(), "/data/noc_regions.csv"))
+```
+
+    ## Rows: 230 Columns: 3
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (3): NOC, region, notes
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 ``` r
 # make appropriate date
@@ -539,33 +559,32 @@ olympics %<>%
            medal == "Silver" ~ 2,
            medal == "Gold" ~ 3,
            TRUE ~ 0))
+
+noc_regions %<>%
+  janitor::clean_names() %>%
+  mutate(region = ifelse(region == "Boliva", "Bolivia", region))
+
+flags <- tibble(noc = noc_regions$noc, region = noc_regions$region, flag = countrycode(noc_regions$region, 'country.name', 'unicode.symbol'))
 ```
 
-Next, we will mutate `medal` from a categorical variable with ‘Gold’,
-‘Silver’, ‘Bronze’, and NA as outcomes to either a numeric indicator
-(medal = 1 for any win and medal = 0 for no medal received) or a score
-that rewards the most points for Gold, then Silver, then Bronze. Through
-iterative visualization we will determine whether examining success only
-based on medal count or differentiating gold, silver, and bronze
-victories allows for a more meaningful display of trends. We will also
-later group the observations by region of National Olympic Committee, or
-`noc`, which reflects what we understand to be country identities today
-more accurately than `team` does. Merging in this [secondary
-dataset](https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results?select=noc_regions.csv)
-provided with the athlete-event level data by Kaggle will allow us to
-expand our country labeling from three-letter NOC abbreviations to
-complete country names. Additionally, the dataframe in the package
-[countrycode](https://vincentarelbundock.github.io/countrycode/) links
-countries by their names in various formats to their unicode flag
-emojis. Merging this data in will assist us with our visualizations of
-this question.
+    ## Warning in countrycode_convert(sourcevar = sourcevar, origin = origin, destination = dest, : Some values were not matched unambiguously: Individual Olympic Athletes, Micronesia
 
-After the above merging and necessary cleaning, we will group the data
-by `country`, `sport`, and `date` to compute a new variable called
-`medals_total` by taking the sum of either our medal-won indicator or
-our medal score assigned to differentiate gold, silver and bronze
-victories. These steps should allow us to begin an initial approach to
-visualization.
+``` r
+olympics <- left_join(olympics, flags, by = "noc")
+
+olympics_cty <- olympics %>%
+  group_by(region, sport, date) %>%
+  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop")
+```
+
+``` r
+olympics_cty %>%
+  filter(sport == "Gymnastics") %>%
+  ggplot(aes(x = date, y = total_score, group = region)) +
+  geom_line()
+```
+
+<img src="README_files/figure-gfm/unnamed-chunk-3-1.png" width="80%" />
 
 In our first visualization, we will plot `medals_total` on the y-axis
 and `date` on the x-axis with lines grouped by `country` and faceting by
@@ -575,6 +594,52 @@ strongly highlight a few countries and make the remaining lines
 indistinguishable in the background. If this technique remains visually
 overwhelming after prototyping our plot, we will filter to select just a
 few countries of interest in each sport and color map only those.
+
+#### Plot 2
+
+``` r
+gdp <- read_csv("data/gdp-per-capita-maddison-2020.csv")
+```
+
+    ## Warning: One or more parsing issues, see `problems()` for details
+
+    ## Rows: 19878 Columns: 5
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (2): Entity, Code
+    ## dbl (2): Year, GDP per capita
+    ## lgl (1): 145446-annotations
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+gdp %<>%
+  janitor::clean_names()
+```
+
+``` r
+olympics_gdp <- olympics %>%
+  group_by(region, date) %>%
+  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop") %>%
+  rename(entity = region) %>%
+  mutate(year = year(date)) %>%
+  left_join(gdp, by = c("entity", "year"))
+```
+
+``` r
+olympics_gdp %>%
+  filter(year >= 2010) %>%
+  ggplot(aes(x = gdp_per_capita, total_score)) +
+  geom_point() +
+  facet_wrap(~date)
+```
+
+    ## Warning: Removed 123 rows containing missing values (geom_point).
+
+<img src="README_files/figure-gfm/unnamed-chunk-6-1.png" width="80%" />
 
 ### Discussion
 

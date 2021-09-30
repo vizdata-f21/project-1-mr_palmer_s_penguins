@@ -311,6 +311,7 @@ olympics %>%
         legend.margin = margin(1, 5, 5, 5),
         legend.key.size = unit(0.5, "cm"))
 ```
+
 The mean was used, rather than the median, of `age` as this better captures the range of ages of athletes for a given year.
 
 ### Discussion
@@ -332,6 +333,7 @@ olympics %>%
   filter(year <= 1920) %>%
   count(sex)
 ```
+
 These numbers are the total number of unique participants participating in each Olympics game prior to 1920.
 
 ## Question 2 <- Update title to relate to the question you’re answering
