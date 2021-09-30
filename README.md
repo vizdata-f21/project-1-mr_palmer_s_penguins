@@ -2,6 +2,17 @@ Project title
 ================
 by Mr. Palmer’s Penguins
 
+    ## 
+    ## Attaching package: 'magrittr'
+
+    ## The following object is masked from 'package:purrr':
+    ## 
+    ##     set_names
+
+    ## The following object is masked from 'package:tidyr':
+    ## 
+    ##     extract
+
 ## Introduction
 
 (1-2 paragraphs) Brief introduction to the dataset. You may repeat some
@@ -120,7 +131,7 @@ ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = 
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
-       subtitle = "Of athletes competing in weightclass-based Olympic sports",,
+       subtitle = "For athletes competing in weightclass-based Olympic sports",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
   scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
@@ -153,7 +164,7 @@ ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
-       subtitle = "Of athletes competing in coordination-based Olympic sports",,
+       subtitle = "For athletes competing in coordination-based Olympic sports",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
   scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
@@ -186,7 +197,7 @@ ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
-       subtitle = "Of athletes competing in Olympic sports which encompass many skills",,
+       subtitle = "For athletes competing in Olympic sports which encompass many skills",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
   scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
@@ -219,7 +230,7 @@ ggplot(olympics_acrobatic, mapping = aes(y = sport, x = BMI, color = sex)) +
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
-       subtitle = "Of athletes competing in acrobatic Olympic sports",,
+       subtitle = "For athletes competing in acrobatic Olympic sports",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
   scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
@@ -264,7 +275,7 @@ ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
-       subtitle = "Of athletes competing in selected Olympic sports from 1912-2020",,
+       subtitle = "For athletes competing in selected Olympic sports from 1912-2020",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
   scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
@@ -298,6 +309,109 @@ required to do so. All plots must be made with ggplot2. Do not use base
 R or lattice plotting functions.
 
 Plot 2 (Drew):
+
+``` r
+# Create new calculated variables to represent physical build
+olympics <- olympics %>%
+  mutate(height_weight_ratio = height / weight,
+         BMI = 10000 * weight / (height * height))
+```
+
+``` r
+# keep only one observation per athlete
+olympics <- olympics %>%
+    distinct(id, year, .keep_all = TRUE) %>%
+  mutate(sex = factor(sex, labels = c("Female", "Male")))
+```
+
+``` r
+olympics %>%
+  drop_na(age) %>%
+  group_by(year, sex) %>%
+  summarise(avg_age = mean(age)) %>%
+  arrange(desc(sex)) %>%
+  ggplot(mapping = aes(y = avg_age, x = year)) +
+  geom_point(aes(color = sex)) +
+  labs(x = "Year",
+       y = "Age",
+       color = "Sex",
+       title = "Average Yearly Age of Athletes By Sex",
+       subtitle = "For athletes competing in selected Olympic sports from 1912-2020",
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  theme_minimal() +
+  theme(strip.background = element_blank(),
+        strip.text.y = element_blank(),
+        panel.spacing.y = unit(0.4, "cm"),
+        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+        axis.text.x = element_text(family = "Oswald", color = "#092260"),
+        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.title.y = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.text.y = element_text(family = "Oswald", color = "#092260"),
+        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+        legend.title = element_blank(),
+        legend.position = c(0.8, 0.68),
+        legend.background = element_rect(size = 0.3),
+        legend.margin = margin(1, 5, 5, 5),
+        legend.key.size = unit(0.5, "cm"))
+```
+
+    ## `summarise()` has grouped output by 'year'. You can override using the `.groups` argument.
+
+<img src="README_files/figure-gfm/age-plot-1.png" width="80%" /> Tried
+median to see if it gets rid of outlier but does not
+
+For our second plot, we will look more closely at how size
+characteristics have changed over time, using `year` to make a time
+series line plots for these different values. In other words, we will
+plot one of the size characteristics (`height`, `weight`, or the
+height:weight ratio) on the y-axis vs. time on the x-axis. Lines by
+`sex` will connect the observations. We might also facet these plots by
+`age` to see if, for example, height of athletes has changed more or
+less over time for younger athletes vs. older athletes. In order to
+facet by `age`, we will have to make `age` a categorical variable by
+setting different cutoffs in which we group observations.
+
+The ages in the dataset range from 10 to 97 years old. Therefore, we
+will plot a histogram and do summary statistics to understand which
+cutoffs make the most sense given the data. Since athletes tend to be in
+their mid 20s, we’ll likely have smaller differences in ages in the
+20-30 age range whereas all athletes 40-97, for example, might be
+grouped together. However, as mentioned, this would depend on the
+distribution of the data.
+
+Like in Plot 1, we will evaluate which of `height`, `weight`, or the
+`height:weight` ratio provides the most insightful visualization.
+Ideally, the variable we choose in Plot 1 will be the same as in Plot 2;
+however, we understand creating visualizations is an iterative process
+are open to evaluating all options as we plot.
+
+For our second plot, we will look more closely at how size
+characteristics have changed over time, using `year` to make a time
+series line plots for these different values. In other words, we will
+plot one of the size characteristics (`height`, `weight`, or the
+height:weight ratio) on the y-axis vs. time on the x-axis. Lines by
+`sex` will connect the observations. We might also facet these plots by
+`age` to see if, for example, height of athletes has changed more or
+less over time for younger athletes vs. older athletes. In order to
+facet by `age`, we will have to make `age` a categorical variable by
+setting different cutoffs in which we group observations.
+
+The ages in the dataset range from 10 to 97 years old. Therefore, we
+will plot a histogram and do summary statistics to understand which
+cutoffs make the most sense given the data. Since athletes tend to be in
+their mid 20s, we’ll likely have smaller differences in ages in the
+20-30 age range whereas all athletes 40-97, for example, might be
+grouped together. However, as mentioned, this would depend on the
+distribution of the data.
+
+Like in Plot 1, we will evaluate which of `height`, `weight`, or the
+`height:weight` ratio provides the most insightful visualization.
+Ideally, the variable we choose in Plot 1 will be the same as in Plot 2;
+however, we understand creating visualizations is an iterative process
+are open to evaluating all options as we plot.
 
 ### Discussion
 
