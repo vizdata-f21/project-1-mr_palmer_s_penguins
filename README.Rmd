@@ -99,7 +99,7 @@ olympics_acrobatic <- olympics %>%
 
 We are now ready to create a separate plot for each sport category. We will also silence messages which indicate that rows with NA have been dropped from the dataframe when creating the boxplots.
 
-``` {r plot-weightclass, message = FALSE}
+``` {r plot-weightclass, warning = FALSE}
 ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
   labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
@@ -128,7 +128,7 @@ ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = 
         legend.key.size = unit(0.5, "cm"))
 ```
 
-``` {r plot-coordination, message = FALSE}
+``` {r plot-coordination, warning = FALSE}
 ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
   labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
@@ -157,7 +157,7 @@ ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex
         legend.key.size = unit(0.5, "cm"))
 ```
 
-``` {r plot-diverse, message = FALSE}
+``` {r plot-diverse, warning = FALSE}
 ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
   labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
@@ -186,7 +186,7 @@ ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
         legend.key.size = unit(0.5, "cm"))
 ```
 
-``` {r plot-acrobatic, message = FALSE}
+``` {r plot-acrobatic, warning = FALSE}
 ggplot(olympics_acrobatic, mapping = aes(y = sport, x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
   labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
@@ -219,7 +219,7 @@ We found a citation for the Tokyo 2020 Olympics logo font [here](https://www.red
 
 We can now visualize these groups on the same plot, to get a better sense of broader variability in size characteristics among an array of Olympic sports.
 
-``` {r fonts-and-plot-one, message = FALSE}
+``` {r fonts-and-plot-one, warning = FALSE}
 ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
   labs(x = "Body Mass Index (kg/m<sup>2</sup>)",

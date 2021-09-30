@@ -142,8 +142,6 @@ ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = 
         legend.key.size = unit(0.5, "cm"))
 ```
 
-    ## Warning: Removed 4166 rows containing non-finite values (stat_boxplot).
-
 <img src="README_files/figure-gfm/plot-weightclass-1.png" width="80%" />
 
 ``` r
@@ -174,8 +172,6 @@ ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex
         legend.margin = margin(1, 5, 5, 5),
         legend.key.size = unit(0.5, "cm"))
 ```
-
-    ## Warning: Removed 1874 rows containing non-finite values (stat_boxplot).
 
 <img src="README_files/figure-gfm/plot-coordination-1.png" width="80%" />
 
@@ -208,8 +204,6 @@ ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
         legend.key.size = unit(0.5, "cm"))
 ```
 
-    ## Warning: Removed 6082 rows containing non-finite values (stat_boxplot).
-
 <img src="README_files/figure-gfm/plot-diverse-1.png" width="80%" />
 
 ``` r
@@ -240,8 +234,6 @@ ggplot(olympics_acrobatic, mapping = aes(y = sport, x = BMI, color = sex)) +
         legend.margin = margin(1, 5, 5, 5),
         legend.key.size = unit(0.5, "cm"))
 ```
-
-    ## Warning: Removed 1944 rows containing non-finite values (stat_boxplot).
 
 <img src="README_files/figure-gfm/plot-acrobatic-1.png" width="80%" />
 
@@ -285,8 +277,6 @@ ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
         legend.margin = margin(1, 5, 5, 5),
         legend.key.size = unit(0.5, "cm"))
 ```
-
-    ## Warning: Removed 14066 rows containing non-finite values (stat_boxplot).
 
 <img src="README_files/figure-gfm/fonts-and-plot-one-1.png" width="80%" />
 
