@@ -2,17 +2,6 @@ Project title
 ================
 by Mr. Palmer’s Penguins
 
-    ## 
-    ## Attaching package: 'magrittr'
-
-    ## The following object is masked from 'package:purrr':
-    ## 
-    ##     set_names
-
-    ## The following object is masked from 'package:tidyr':
-    ## 
-    ##     extract
-
 ## Introduction
 
 (1-2 paragraphs) Brief introduction to the dataset. You may repeat some
@@ -127,7 +116,7 @@ dropped from the dataframe when creating the boxplots.
 ``` r
 ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
-  labs(x = "Body Mass Index (kg/m^2)",
+  labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
@@ -143,7 +132,7 @@ ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = 
         plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
         plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
         axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
         axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.title = element_blank(),
@@ -153,14 +142,12 @@ ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = 
         legend.key.size = unit(0.5, "cm"))
 ```
 
-    ## Warning: Removed 4166 rows containing non-finite values (stat_boxplot).
-
 <img src="README_files/figure-gfm/plot-weightclass-1.png" width="80%" />
 
 ``` r
 ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
-  labs(x = "Body Mass Index (kg/m^2)",
+  labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
@@ -176,7 +163,7 @@ ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex
         plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
         plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
         axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
         axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.title = element_blank(),
@@ -186,14 +173,12 @@ ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex
         legend.key.size = unit(0.5, "cm"))
 ```
 
-    ## Warning: Removed 1874 rows containing non-finite values (stat_boxplot).
-
 <img src="README_files/figure-gfm/plot-coordination-1.png" width="80%" />
 
 ``` r
 ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
-  labs(x = "Body Mass Index (kg/m^2)",
+  labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
@@ -209,7 +194,7 @@ ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
         plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
         plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
         axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
         axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.title = element_blank(),
@@ -219,14 +204,12 @@ ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
         legend.key.size = unit(0.5, "cm"))
 ```
 
-    ## Warning: Removed 6082 rows containing non-finite values (stat_boxplot).
-
 <img src="README_files/figure-gfm/plot-diverse-1.png" width="80%" />
 
 ``` r
 ggplot(olympics_acrobatic, mapping = aes(y = sport, x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
-  labs(x = "Body Mass Index (kg/m^2)",
+  labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
@@ -242,7 +225,7 @@ ggplot(olympics_acrobatic, mapping = aes(y = sport, x = BMI, color = sex)) +
         plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
         plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
         axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
         axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.title = element_blank(),
@@ -251,8 +234,6 @@ ggplot(olympics_acrobatic, mapping = aes(y = sport, x = BMI, color = sex)) +
         legend.margin = margin(1, 5, 5, 5),
         legend.key.size = unit(0.5, "cm"))
 ```
-
-    ## Warning: Removed 1944 rows containing non-finite values (stat_boxplot).
 
 <img src="README_files/figure-gfm/plot-acrobatic-1.png" width="80%" />
 
@@ -271,7 +252,7 @@ Olympic sports.
 ``` r
 ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
-  labs(x = "Body Mass Index (kg/m^2)",
+  labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
@@ -287,7 +268,7 @@ ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
         plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
         plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
         axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
         axis.text.y = element_text(family = "Oswald", color = "#092260"),
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.title = element_blank(),
@@ -296,8 +277,6 @@ ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
         legend.margin = margin(1, 5, 5, 5),
         legend.key.size = unit(0.5, "cm"))
 ```
-
-    ## Warning: Removed 14066 rows containing non-finite values (stat_boxplot).
 
 <img src="README_files/figure-gfm/fonts-and-plot-one-1.png" width="80%" />
 
