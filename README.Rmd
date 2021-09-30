@@ -385,8 +385,6 @@ noc_regions %<>%
 flags <- tibble(noc = noc_regions$noc, region = noc_regions$region, flag = countrycode(noc_regions$region, 'country.name', 'unicode.symbol'))
 
 olympics <- left_join(olympics, flags, by = "noc")
-
-olympics
 ```
 
 ```{r}
@@ -398,12 +396,6 @@ olympics_filter <- olympics %>%
 
 ```
 
-
-
-```{r}
-olympics_filter
-
-```
 ```{r}
 
 ggplot(olympics_filter, aes(x = reorder(noc, total_winners), y = total_winners, fill = noc, color = noc))+
@@ -438,8 +430,6 @@ usa_fil <- olympics %>%
   group_by(sport, year)%>%
   summarize(total_winners = sum(medal_winner), total_score = sum(medal_score))%>%
   filter(sport %in% c("Swimming", "Athletics"))
-
-usa_fil
 ```
 
 ```{r}
@@ -475,8 +465,6 @@ ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport))+
 ```{r}
 
 usa_fil2 <- ddply(usa_fil, .(sport), transform, cumsumwin = cumsum(total_winners))
-
-usa_fil2
 
 ggplot(usa_fil2, aes(x = year, y = cumsumwin, color = sport, group = sport))+
   geom_line()+

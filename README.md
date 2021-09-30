@@ -11,6 +11,22 @@ by Mr. Palmer’s Penguins
 
     ## Loading required package: ggplot2
 
+    ## 
+    ## Attaching package: 'dplyr'
+
+    ## The following objects are masked from 'package:plyr':
+    ## 
+    ##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+    ##     summarize
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
+
     ## Rows: 271116 Columns: 15
 
     ## ── Column specification ────────────────────────────────────────────────────────
@@ -573,27 +589,7 @@ flags <- tibble(noc = noc_regions$noc, region = noc_regions$region, flag = count
 
 ``` r
 olympics <- left_join(olympics, flags, by = "noc")
-
-<<<<<<< HEAD
-olympics
 ```
-
-    ## # A tibble: 271,116 × 20
-    ##       id name    sex     age height weight team   noc   games  year season city 
-    ##    <dbl> <chr>   <chr> <dbl>  <dbl>  <dbl> <chr>  <chr> <chr> <dbl> <chr>  <chr>
-    ##  1     1 A Diji… M        24    180     80 China  CHN   1992…  1992 Summer Barc…
-    ##  2     2 A Lamu… M        23    170     60 China  CHN   2012…  2012 Summer Lond…
-    ##  3     3 Gunnar… M        24     NA     NA Denma… DEN   1920…  1920 Summer Antw…
-    ##  4     4 Edgar … M        34     NA     NA Denma… DEN   1900…  1900 Summer Paris
-    ##  5     5 Christ… F        21    185     82 Nethe… NED   1988…  1988 Winter Calg…
-    ##  6     5 Christ… F        21    185     82 Nethe… NED   1988…  1988 Winter Calg…
-    ##  7     5 Christ… F        25    185     82 Nethe… NED   1992…  1992 Winter Albe…
-    ##  8     5 Christ… F        25    185     82 Nethe… NED   1992…  1992 Winter Albe…
-    ##  9     5 Christ… F        27    185     82 Nethe… NED   1994…  1994 Winter Lill…
-    ## 10     5 Christ… F        27    185     82 Nethe… NED   1994…  1994 Winter Lill…
-    ## # … with 271,106 more rows, and 8 more variables: sport <chr>, event <chr>,
-    ## #   medal <chr>, date <date>, medal_winner <dbl>, medal_score <dbl>,
-    ## #   region <chr>, flag <chr>
 
 ``` r
 olympics_filter <- olympics %>%
@@ -602,24 +598,6 @@ olympics_filter <- olympics %>%
   summarize(total_winners = sum(medal_winner), total_score = sum(medal_score))%>%
   filter(total_winners >= 910)
 ```
-
-``` r
-olympics_filter
-```
-
-    ## # A tibble: 10 × 3
-    ##    noc   total_winners total_score
-    ##    <chr>         <dbl>       <dbl>
-    ##  1 AUS            1304        2440
-    ##  2 FRA            1627        3132
-    ##  3 GBR            1985        3986
-    ##  4 GER            1779        3501
-    ##  5 HUN            1123        2315
-    ##  6 ITA            1446        2956
-    ##  7 NED             918        1710
-    ##  8 SWE            1108        2212
-    ##  9 URS            2063        4362
-    ## 10 USA            5002       11279
 
 ``` r
 ggplot(olympics_filter, aes(x = reorder(noc, total_winners), y = total_winners, fill = noc, color = noc))+
@@ -658,32 +636,12 @@ usa_fil <- olympics %>%
     ## `summarise()` has grouped output by 'sport'. You can override using the `.groups` argument.
 
 ``` r
-usa_fil
-```
-
-    ## # A tibble: 56 × 4
-    ## # Groups:   sport [2]
-    ##    sport      year total_winners total_score
-    ##    <chr>     <dbl>         <dbl>       <dbl>
-    ##  1 Athletics  1896            17          41
-    ##  2 Athletics  1900            39          84
-    ##  3 Athletics  1904            72         149
-    ##  4 Athletics  1906            23          51
-    ##  5 Athletics  1908            41          93
-    ##  6 Athletics  1912            49         109
-    ##  7 Athletics  1920            36          80
-    ##  8 Athletics  1924            48          99
-    ##  9 Athletics  1928            34          75
-    ## 10 Athletics  1932            44         107
-    ## # … with 46 more rows
-
-``` r
 ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport))+
   geom_line()+
   geom_point()+
   labs(x = "Year",
        y = "Medal Count",
-       title = "USA Medals Won in Athletics and Swimming",
+       title = "USA Olympic Medals Won in Athletics and Swimming",
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
   theme_minimal() +
   scale_color_manual(values = c("#7B38EC","#5CC0AB"))+
@@ -708,11 +666,13 @@ ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport))+
 <img src="README_files/figure-gfm/unnamed-chunk-6-1.png" width="80%" />
 
 ``` r
-ggplot(usa_fil, aes(x = year, y = cumsum(total_winners), color = sport, group = sport))+
+usa_fil2 <- ddply(usa_fil, .(sport), transform, cumsumwin = cumsum(total_winners))
+
+ggplot(usa_fil2, aes(x = year, y = cumsumwin, color = sport, group = sport))+
   geom_line()+
   labs(x = "Year",
-       y = "Medal Count",
-       title = "USA Medals Won in Athletics and Swimming",
+       y = "Cumulative Medal Count",
+       title = "USA Cumulative Olympic Medals Won in Athletics and Swimming",
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
   theme_minimal() +
   scale_color_manual(values = c("#7B38EC","#5CC0AB"))+
@@ -735,21 +695,6 @@ ggplot(usa_fil, aes(x = year, y = cumsum(total_winners), color = sport, group = 
 ```
 
 <img src="README_files/figure-gfm/unnamed-chunk-7-1.png" width="80%" />
-=======
-olympics_cty <- olympics %>%
-  group_by(region, sport, date) %>%
-  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop")
-```
-
-``` r
-olympics_cty %>%
-  filter(sport == "Gymnastics") %>%
-  ggplot(aes(x = date, y = total_score, group = region)) +
-  geom_line()
-```
-
-<img src="README_files/figure-gfm/unnamed-chunk-3-1.png" width="80%" />
->>>>>>> 0e4936f6e8d5419e58eb8fa5dc5b0ab37f00134f
 
 In our first visualization, we will plot `medals_total` on the y-axis
 and `date` on the x-axis with lines grouped by `country` and faceting by
@@ -804,11 +749,7 @@ olympics_gdp %>%
 
     ## Warning: Removed 123 rows containing missing values (geom_point).
 
-<<<<<<< HEAD
 <img src="README_files/figure-gfm/unnamed-chunk-10-1.png" width="80%" />
-=======
-<img src="README_files/figure-gfm/unnamed-chunk-6-1.png" width="80%" />
->>>>>>> 0e4936f6e8d5419e58eb8fa5dc5b0ab37f00134f
 
 ### Discussion
 
