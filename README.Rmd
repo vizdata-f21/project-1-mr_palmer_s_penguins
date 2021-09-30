@@ -8,6 +8,9 @@ output: github_document
 # load packages here
 library(lubridate)
 library(countrycode)
+library(gganimate)
+library(plyr)
+library(dplyr)
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(showtext)) # cool fonts
 suppressPackageStartupMessages(library(magrittr))
@@ -387,16 +390,123 @@ flags <- tibble(noc = noc_regions$noc, region = noc_regions$region, flag = count
 
 olympics <- left_join(olympics, flags, by = "noc")
 
-olympics_cty <- olympics %>%
-  group_by(region, sport, date) %>%
-  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop")
+olympics
 ```
 
 ```{r}
-olympics_cty %>%
-  filter(sport == "Gymnastics") %>%
-  ggplot(aes(x = date, y = total_score, group = region)) +
-  geom_line()
+olympics_filter <- olympics %>%
+  filter(season == "Summer") %>%
+  group_by(noc) %>%
+  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score))%>%
+  filter(total_winners >= 910)
+
+```
+
+
+
+```{r}
+olympics_filter
+
+```
+```{r}
+
+ggplot(olympics_filter, aes(x = reorder(noc, total_winners), y = total_winners, fill = noc, color = noc))+
+  geom_bar(stat='identity')+
+  labs(x = "Country",
+       y = "Medal Count",
+       title = "All-time Summer Olympic Medal Counts",
+       subtitle = "For the top 10 most winningest countries in history",
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  theme_minimal() +
+  scale_color_manual(values = c("#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB")) +
+  scale_fill_manual(values = c("#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB")) +
+  theme(strip.background = element_blank(),
+        strip.text.y = element_blank(),
+        panel.spacing.y = unit(0.4, "cm"),
+        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+        axis.text.x = element_text(family = "Oswald", color = "#092260"),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+        axis.text.y = element_text(family = "Oswald", color = "#092260"),
+        axis.title.y = element_markdown(family = "Oswald", color = "#092260", size = 14),
+        legend.position = "none")
+
+
+```
+
+```{r}
+
+usa_fil <- olympics %>%
+  filter(noc == "USA") %>%
+  group_by(sport, year)%>%
+  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score))%>%
+  filter(sport %in% c("Swimming", "Athletics"))
+
+usa_fil
+```
+
+```{r}
+
+ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport))+
+  geom_line()+
+  geom_point()+
+  labs(x = "Year",
+       y = "Medal Count",
+       title = "USA Olympic Medals Won in Athletics and Swimming",
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  theme_minimal() +
+  scale_color_manual(values = c("#7B38EC","#5CC0AB"))+
+  theme(strip.background = element_blank(),
+        strip.text.y = element_blank(),
+        panel.spacing.y = unit(0.4, "cm"),
+        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+        axis.text.x = element_text(family = "Oswald", color = "#092260"),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+        axis.text.y = element_text(family = "Oswald", color = "#092260"),
+        axis.title.y = element_markdown(family = "Oswald", color = "#092260", size = 14),
+        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+        legend.title = element_blank(),
+        legend.position = c(0.8, 0.18),
+        legend.background = element_rect(size = 0.3),
+        legend.margin = margin(1, 5, 5, 5),
+        legend.key.size = unit(0.5, "cm"))
+
+```
+
+```{r}
+
+usa_fil2 <- ddply(usa_fil, .(sport), transform, cumsumwin = cumsum(total_winners))
+
+usa_fil2
+
+ggplot(usa_fil2, aes(x = year, y = cumsumwin, color = sport, group = sport))+
+  geom_line()+
+  labs(x = "Year",
+       y = "Cumulative Medal Count",
+       title = "USA Cumulative Olympic Medals Won in Athletics and Swimming",
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  theme_minimal() +
+  scale_color_manual(values = c("#7B38EC","#5CC0AB"))+
+  theme(strip.background = element_blank(),
+        strip.text.y = element_blank(),
+        panel.spacing.y = unit(0.4, "cm"),
+        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+        axis.text.x = element_text(family = "Oswald", color = "#092260"),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+        axis.text.y = element_text(family = "Oswald", color = "#092260"),
+        axis.title.y = element_markdown(family = "Oswald", color = "#092260", size = 14),
+        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+        legend.title = element_blank(),
+        legend.position = c(0.8, 0.18),
+        legend.background = element_rect(size = 0.3),
+        legend.margin = margin(1, 5, 5, 5),
+        legend.key.size = unit(0.5, "cm"))
+
 ```
 
 In our first visualization, we will plot `medals_total` on the y-axis and `date` on the x-axis with lines grouped by `country` and faceting by `sport`. We will select just a few sports of interest to compare and use selective color mapping for countries of interest and transparency to strongly highlight a few countries and make the remaining lines indistinguishable in the background. If this technique remains visually overwhelming after prototyping our plot, we will filter to select just a few countries of interest in each sport and color map only those.

@@ -9,22 +9,14 @@ by Mr. Palmer’s Penguins
     ## 
     ##     date, intersect, setdiff, union
 
+    ## Loading required package: ggplot2
+
     ## Rows: 271116 Columns: 15
 
     ## ── Column specification ────────────────────────────────────────────────────────
     ## Delimiter: ","
     ## chr (10): name, sex, team, noc, games, season, city, sport, event, medal
     ## dbl  (5): id, age, height, weight, year
-
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-    ## Rows: 230 Columns: 3
-
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr (3): NOC, region, notes
 
     ## 
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
@@ -496,7 +488,36 @@ section, provide the code that generates your plots. Use scale functions
 to provide nice axis labels and guides. You are welcome to use theme
 functions to customize the appearance of your plot, but you are not
 required to do so. All plots must be made with ggplot2. Do not use base
-R or lattice plotting functions.
+R or lattice plotting functions. \#\#\#\# Plot 1
+
+``` r
+olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
+```
+
+    ## Rows: 271116 Columns: 15
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (10): name, sex, team, noc, games, season, city, sport, event, medal
+    ## dbl  (5): id, age, height, weight, year
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+noc_regions <- read_csv(file = paste0(here::here(), "/data/noc_regions.csv"))
+```
+
+    ## Rows: 230 Columns: 3
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (3): NOC, region, notes
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 ``` r
 # make appropriate date
@@ -509,33 +530,179 @@ olympics %<>%
            medal == "Silver" ~ 2,
            medal == "Gold" ~ 3,
            TRUE ~ 0))
+
+noc_regions %<>%
+  janitor::clean_names() %>%
+  mutate(region = ifelse(region == "Boliva", "Bolivia", region))
+
+flags <- tibble(noc = noc_regions$noc, region = noc_regions$region, flag = countrycode(noc_regions$region, 'country.name', 'unicode.symbol'))
 ```
 
-Next, we will mutate `medal` from a categorical variable with ‘Gold’,
-‘Silver’, ‘Bronze’, and NA as outcomes to either a numeric indicator
-(medal = 1 for any win and medal = 0 for no medal received) or a score
-that rewards the most points for Gold, then Silver, then Bronze. Through
-iterative visualization we will determine whether examining success only
-based on medal count or differentiating gold, silver, and bronze
-victories allows for a more meaningful display of trends. We will also
-later group the observations by region of National Olympic Committee, or
-`noc`, which reflects what we understand to be country identities today
-more accurately than `team` does. Merging in this [secondary
-dataset](https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results?select=noc_regions.csv)
-provided with the athlete-event level data by Kaggle will allow us to
-expand our country labeling from three-letter NOC abbreviations to
-complete country names. Additionally, the dataframe in the package
-[countrycode](https://vincentarelbundock.github.io/countrycode/) links
-countries by their names in various formats to their unicode flag
-emojis. Merging this data in will assist us with our visualizations of
-this question.
+    ## Warning in countrycode_convert(sourcevar = sourcevar, origin = origin, destination = dest, : Some values were not matched unambiguously: Individual Olympic Athletes, Micronesia
 
-After the above merging and necessary cleaning, we will group the data
-by `country`, `sport`, and `date` to compute a new variable called
-`medals_total` by taking the sum of either our medal-won indicator or
-our medal score assigned to differentiate gold, silver and bronze
-victories. These steps should allow us to begin an initial approach to
-visualization.
+``` r
+olympics <- left_join(olympics, flags, by = "noc")
+
+olympics
+```
+
+    ## # A tibble: 271,116 × 20
+    ##       id name    sex     age height weight team   noc   games  year season city 
+    ##    <dbl> <chr>   <chr> <dbl>  <dbl>  <dbl> <chr>  <chr> <chr> <dbl> <chr>  <chr>
+    ##  1     1 A Diji… M        24    180     80 China  CHN   1992…  1992 Summer Barc…
+    ##  2     2 A Lamu… M        23    170     60 China  CHN   2012…  2012 Summer Lond…
+    ##  3     3 Gunnar… M        24     NA     NA Denma… DEN   1920…  1920 Summer Antw…
+    ##  4     4 Edgar … M        34     NA     NA Denma… DEN   1900…  1900 Summer Paris
+    ##  5     5 Christ… F        21    185     82 Nethe… NED   1988…  1988 Winter Calg…
+    ##  6     5 Christ… F        21    185     82 Nethe… NED   1988…  1988 Winter Calg…
+    ##  7     5 Christ… F        25    185     82 Nethe… NED   1992…  1992 Winter Albe…
+    ##  8     5 Christ… F        25    185     82 Nethe… NED   1992…  1992 Winter Albe…
+    ##  9     5 Christ… F        27    185     82 Nethe… NED   1994…  1994 Winter Lill…
+    ## 10     5 Christ… F        27    185     82 Nethe… NED   1994…  1994 Winter Lill…
+    ## # … with 271,106 more rows, and 8 more variables: sport <chr>, event <chr>,
+    ## #   medal <chr>, date <date>, medal_winner <dbl>, medal_score <dbl>,
+    ## #   region <chr>, flag <chr>
+
+``` r
+olympics_filter <- olympics %>%
+  filter(season == "Summer") %>%
+  group_by(noc) %>%
+  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score))%>%
+  filter(total_winners >= 910)
+```
+
+``` r
+olympics_filter
+```
+
+    ## # A tibble: 10 × 3
+    ##    noc   total_winners total_score
+    ##    <chr>         <dbl>       <dbl>
+    ##  1 AUS            1304        2440
+    ##  2 FRA            1627        3132
+    ##  3 GBR            1985        3986
+    ##  4 GER            1779        3501
+    ##  5 HUN            1123        2315
+    ##  6 ITA            1446        2956
+    ##  7 NED             918        1710
+    ##  8 SWE            1108        2212
+    ##  9 URS            2063        4362
+    ## 10 USA            5002       11279
+
+``` r
+ggplot(olympics_filter, aes(x = reorder(noc, total_winners), y = total_winners, fill = noc, color = noc))+
+  geom_bar(stat='identity')+
+  labs(x = "Country",
+       y = "Medal Count",
+       title = "All-time Summer Olympic Medal Counts",
+       subtitle = "For the top 10 most winningest countries in history",
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  theme_minimal() +
+  scale_color_manual(values = c("#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB")) +
+  scale_fill_manual(values = c("#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB")) +
+  theme(strip.background = element_blank(),
+        strip.text.y = element_blank(),
+        panel.spacing.y = unit(0.4, "cm"),
+        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+        axis.text.x = element_text(family = "Oswald", color = "#092260"),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+        axis.text.y = element_text(family = "Oswald", color = "#092260"),
+        axis.title.y = element_markdown(family = "Oswald", color = "#092260", size = 14),
+        legend.position = "none")
+```
+
+<img src="README_files/figure-gfm/unnamed-chunk-4-1.png" width="80%" />
+
+``` r
+usa_fil <- olympics %>%
+  filter(noc == "USA") %>%
+  group_by(sport, year)%>%
+  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score))%>%
+  filter(sport %in% c("Swimming", "Athletics"))
+```
+
+    ## `summarise()` has grouped output by 'sport'. You can override using the `.groups` argument.
+
+``` r
+usa_fil
+```
+
+    ## # A tibble: 56 × 4
+    ## # Groups:   sport [2]
+    ##    sport      year total_winners total_score
+    ##    <chr>     <dbl>         <dbl>       <dbl>
+    ##  1 Athletics  1896            17          41
+    ##  2 Athletics  1900            39          84
+    ##  3 Athletics  1904            72         149
+    ##  4 Athletics  1906            23          51
+    ##  5 Athletics  1908            41          93
+    ##  6 Athletics  1912            49         109
+    ##  7 Athletics  1920            36          80
+    ##  8 Athletics  1924            48          99
+    ##  9 Athletics  1928            34          75
+    ## 10 Athletics  1932            44         107
+    ## # … with 46 more rows
+
+``` r
+ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport))+
+  geom_line()+
+  geom_point()+
+  labs(x = "Year",
+       y = "Medal Count",
+       title = "USA Medals Won in Athletics and Swimming",
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  theme_minimal() +
+  scale_color_manual(values = c("#7B38EC","#5CC0AB"))+
+  theme(strip.background = element_blank(),
+        strip.text.y = element_blank(),
+        panel.spacing.y = unit(0.4, "cm"),
+        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+        axis.text.x = element_text(family = "Oswald", color = "#092260"),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+        axis.text.y = element_text(family = "Oswald", color = "#092260"),
+        axis.title.y = element_markdown(family = "Oswald", color = "#092260", size = 14),
+        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+        legend.title = element_blank(),
+        legend.position = c(0.8, 0.18),
+        legend.background = element_rect(size = 0.3),
+        legend.margin = margin(1, 5, 5, 5),
+        legend.key.size = unit(0.5, "cm"))
+```
+
+<img src="README_files/figure-gfm/unnamed-chunk-6-1.png" width="80%" />
+
+``` r
+ggplot(usa_fil, aes(x = year, y = cumsum(total_winners), color = sport, group = sport))+
+  geom_line()+
+  labs(x = "Year",
+       y = "Medal Count",
+       title = "USA Medals Won in Athletics and Swimming",
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  theme_minimal() +
+  scale_color_manual(values = c("#7B38EC","#5CC0AB"))+
+  theme(strip.background = element_blank(),
+        strip.text.y = element_blank(),
+        panel.spacing.y = unit(0.4, "cm"),
+        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+        axis.text.x = element_text(family = "Oswald", color = "#092260"),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+        axis.text.y = element_text(family = "Oswald", color = "#092260"),
+        axis.title.y = element_markdown(family = "Oswald", color = "#092260", size = 14),
+        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+        legend.title = element_blank(),
+        legend.position = c(0.8, 0.18),
+        legend.background = element_rect(size = 0.3),
+        legend.margin = margin(1, 5, 5, 5),
+        legend.key.size = unit(0.5, "cm"))
+```
+
+<img src="README_files/figure-gfm/unnamed-chunk-7-1.png" width="80%" />
 
 In our first visualization, we will plot `medals_total` on the y-axis
 and `date` on the x-axis with lines grouped by `country` and faceting by
@@ -545,6 +712,52 @@ strongly highlight a few countries and make the remaining lines
 indistinguishable in the background. If this technique remains visually
 overwhelming after prototyping our plot, we will filter to select just a
 few countries of interest in each sport and color map only those.
+
+#### Plot 2
+
+``` r
+gdp <- read_csv("data/gdp-per-capita-maddison-2020.csv")
+```
+
+    ## Warning: One or more parsing issues, see `problems()` for details
+
+    ## Rows: 19878 Columns: 5
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (2): Entity, Code
+    ## dbl (2): Year, GDP per capita
+    ## lgl (1): 145446-annotations
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+gdp %<>%
+  janitor::clean_names()
+```
+
+``` r
+olympics_gdp <- olympics %>%
+  group_by(region, date) %>%
+  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop") %>%
+  rename(entity = region) %>%
+  mutate(year = year(date)) %>%
+  left_join(gdp, by = c("entity", "year"))
+```
+
+``` r
+olympics_gdp %>%
+  filter(year >= 2010) %>%
+  ggplot(aes(x = gdp_per_capita, total_score)) +
+  geom_point() +
+  facet_wrap(~date)
+```
+
+    ## Warning: Removed 123 rows containing missing values (geom_point).
+
+<img src="README_files/figure-gfm/unnamed-chunk-10-1.png" width="80%" />
 
 ### Discussion
 
