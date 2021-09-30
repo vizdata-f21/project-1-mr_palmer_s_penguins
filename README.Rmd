@@ -9,12 +9,9 @@ output: github_document
 library(lubridate)
 library(countrycode)
 library(gganimate)
-<<<<<<< HEAD
 library(gifski)
-=======
 library(plyr)
 library(dplyr)
->>>>>>> 2997df38a94e57c4f255e9b2a8e8ae74a97ebe80
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(showtext)) # cool fonts
 suppressPackageStartupMessages(library(magrittr))
