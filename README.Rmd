@@ -35,14 +35,9 @@ We chose this dataset because we think it can provide a lot of good insights int
 
 This dataset was accessed on [kaggle.com](https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results) and includes data scraped in May 2018 from Sports Reference/OlympStats, sports statistics sites, by Randi Griffin, a Senior Data Scientist at Boston Consulting Group. Moreover, it was selected as part of the [TidyTuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021#readme7c70d95441aec295a1e92da9d71e2872877d663c) challenge on 7/27/21.
 
-## Do certain physical characteristics (such as body mass index, age, and sex) of Olympic participants differ by sport and/or change over time?
-
-
-
-How have the physical characteristics () of Olympic participants changed over time and do they differ by sport?
+## Do certain physical characteristics (such as body mass index, age, and sex) of Olympic participants differ by sport and/or change with time?
 
 Does the optimal build of an Olympic athlete differ by sex or by sport? 
-
 How have the ages of these Olympic athletes evolved over time?
 
 ### Introduction
