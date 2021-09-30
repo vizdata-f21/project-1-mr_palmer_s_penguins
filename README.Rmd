@@ -18,7 +18,6 @@ olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"), sho
 
 ```
 
-
 ```{r set-options, echo = FALSE}
 knitr::opts_chunk$set(fig.width = 8, fig.asp= 0.618, out.width = "80%")
 
@@ -26,12 +25,21 @@ knitr::opts_chunk$set(fig.width = 8, fig.asp= 0.618, out.width = "80%")
 
 ## Introduction
 
-(1-2 paragraphs)
-Brief introduction to the dataset.
-You may repeat some of the information about the dataset provided in the introduction to the dataset on the TidyTuesday repository, paraphrasing on your own terms.
-Imagine that your project is a standalone document and the grader has no prior knowledge of the dataset.
+The set, which includes `r ncol(olympics)` variables and `r nrow(olympics)` observations, provides insight into the athletes that competed in and the results of the Olympic games from Athens 1896 to Rio 2016. Each observation includes information about an athlete on a per event basis. Therefore, if an athlete competes in multiple different events, there will be multiple different observations reflecting each event an individual participated in. Each observation details medal results (Gold, Silver, Bronze, or NA), the athlete's background (age, sex, height, weight, team they're competing for, etc.), and context about the event (where and when it was held, season, sport the athlete competes in, etc.).
 
-## Does the optimal build of an Olympic athlete differ by sex or by sport? How have the trends in height and weight of Olympic athletes evolved over time?
+We chose this dataset because we think it can provide a lot of good insights into some of the trends at the Olympics over the past century as well as provide strong opportunities for our group to develop our visualization capabilities. 
+
+This dataset was accessed on [kaggle.com](https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results) and includes data scraped in May 2018 from Sports Reference/OlympStats, sports statistics sites, by Randi Griffin, a Senior Data Scientist at Boston Consulting Group. Moreover, it was selected as part of the [TidyTuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021#readme7c70d95441aec295a1e92da9d71e2872877d663c) challenge on 7/27/21.
+
+## Do certain physical characteristics (such as body mass index, age, and sex) of Olympic participants differ by sport and/or change over time?
+
+
+
+How have the physical characteristics () of Olympic participants changed over time and do they differ by sport?
+
+Does the optimal build of an Olympic athlete differ by sex or by sport? 
+
+How have the ages of these Olympic athletes evolved over time?
 
 ### Introduction
 
