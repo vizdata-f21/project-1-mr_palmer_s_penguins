@@ -360,6 +360,7 @@ The two plots should be of different types, and at least one of the two plots ne
 In this section, provide the code that generates your plots. Use scale functions to provide nice axis labels and guides.
 You are welcome to use theme functions to customize the appearance of your plot, but you are not required to do so.
 All plots must be made with ggplot2. Do not use base R or lattice plotting functions.
+#### Plot 1
 
 ```{r}
 olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
@@ -385,19 +386,46 @@ noc_regions %<>%
 flags <- tibble(noc = noc_regions$noc, region = noc_regions$region, flag = countrycode(noc_regions$region, 'country.name', 'unicode.symbol'))
 
 olympics <- left_join(olympics, flags, by = "noc")
+
+olympics_cty <- olympics %>%
+  group_by(region, sport, date) %>%
+  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop")
 ```
 
 ```{r}
-olympics %>%
+olympics_cty %>%
   filter(sport == "Gymnastics") %>%
-  group_by(region, sport, date) %>%
-  summarize(total_winners = sum(medal_winner), .groups = "drop") %>%
-  ggplot(aes(x = date, y = total_winners, group = region)) +
+  ggplot(aes(x = date, y = total_score, group = region)) +
   geom_line()
 ```
 
-
 In our first visualization, we will plot `medals_total` on the y-axis and `date` on the x-axis with lines grouped by `country` and faceting by `sport`. We will select just a few sports of interest to compare and use selective color mapping for countries of interest and transparency to strongly highlight a few countries and make the remaining lines indistinguishable in the background. If this technique remains visually overwhelming after prototyping our plot, we will filter to select just a few countries of interest in each sport and color map only those.
+
+#### Plot 2
+
+```{r}
+gdp <- read_csv("data/gdp-per-capita-maddison-2020.csv")
+
+gdp %<>%
+  janitor::clean_names()
+```
+
+```{r}
+olympics_gdp <- olympics %>%
+  group_by(region, date) %>%
+  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop") %>%
+  rename(entity = region) %>%
+  mutate(year = year(date)) %>%
+  left_join(gdp, by = c("entity", "year"))
+```
+
+```{r}
+olympics_gdp %>%
+  filter(year >= 2010) %>%
+  ggplot(aes(x = gdp_per_capita, total_score)) +
+  geom_point() +
+  facet_wrap(~date)
+```
 
 ### Discussion
 
