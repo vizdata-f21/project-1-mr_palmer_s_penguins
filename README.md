@@ -116,7 +116,7 @@ dropped from the dataframe when creating the boxplots.
 ``` r
 ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
-  labs(x = "Body Mass Index (kg/m^2)",
+  labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
@@ -132,7 +132,7 @@ ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = 
         plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
         plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
         axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
         axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.title = element_blank(),
@@ -149,7 +149,7 @@ ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = 
 ``` r
 ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
-  labs(x = "Body Mass Index (kg/m^2)",
+  labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
@@ -165,7 +165,7 @@ ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex
         plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
         plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
         axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
         axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.title = element_blank(),
@@ -182,7 +182,7 @@ ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex
 ``` r
 ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
-  labs(x = "Body Mass Index (kg/m^2)",
+  labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
@@ -198,7 +198,7 @@ ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
         plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
         plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
         axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
         axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.title = element_blank(),
@@ -215,7 +215,7 @@ ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
 ``` r
 ggplot(olympics_acrobatic, mapping = aes(y = sport, x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
-  labs(x = "Body Mass Index (kg/m^2)",
+  labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
@@ -231,7 +231,7 @@ ggplot(olympics_acrobatic, mapping = aes(y = sport, x = BMI, color = sex)) +
         plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
         plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
         axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
         axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.title = element_blank(),
@@ -260,7 +260,7 @@ Olympic sports.
 ``` r
 ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
-  labs(x = "Body Mass Index (kg/m^2)",
+  labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
        y = NULL,
        color = "Sex",
        title = "Sex vs Body Mass Index Distribution",
@@ -276,7 +276,7 @@ ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
         plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
         plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
         axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
         axis.text.y = element_text(family = "Oswald", color = "#092260"),
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
         legend.title = element_blank(),
