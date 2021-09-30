@@ -50,24 +50,40 @@ challenge on 7/27/21.
 
 ## Do certain physical characteristics (such as body mass index, age, and sex) of Olympic participants differ by sport and/or change with time?
 
-Does the optimal build of an Olympic athlete differ by sex or by sport?
-How have the ages of these Olympic athletes evolved over time?
-
 ### Introduction
 
 (1-2 paragraphs) Introduction to the question and what parts of the
 dataset are necessary to answer the question. Also discuss why you’re
 interested in this question.
 
-We are interested in exploring the physical characteristics of Olympic
-athletes. The Olympic Games is unique in showcasing a variety of
-disciplines and the body types of athletes who succeed at them. For
-example, imagine a typical male Olympic wrestler, versus a typical
-female gymnast. Pretty disparate builds, right? Even within one sport,
-say gymnastics, we hypothesize that there may be different optimal
-heights and weights for successful athletes of different genders
-Therefore, to answer our first question, we will visualize the variables
-`height`, `weight`, `age`, `sex`, `sport`, and `year`.
+As we know, the Olympic Games is a unique opportunity for diverse and
+talented individuals to showcase their skills across a variety of
+disciplines. As a result, we are interested in better understanding how
+the diversity of physical characteristics in the set of competing
+athletes potentially differs by sport and/or has changed with time.
+Three physcial characteristics of interest are body mass index (a ratio
+of `height` and `weight`), `sex`, and `age`. It’s often the case that
+the media/press discuss these these physical characteristics as key
+metrics when describing athletes. Therefore, we are curious about better
+understanding the extent to which these differ (if at all).
+
+Firstly, we are hoping to understand if the optimal build of an Olympic
+athlete differs by `sex` or by `sport`. For example, a high performing
+male Olympic wrestler is likely to have a different build versus a
+typical female gymnast. Pretty disparate builds, right? Even within one
+sport, say gymnastics, we hypothesize that there may be different
+optimal heights and weights for successful athletes of different sexes.
+
+Secondly, we will assess if the mean age of Olympic participants for a
+given `year` has changed with time by `sex`. We know that over time the
+Olympics have transitioned from an amateur to professional competition.
+Therefore, we are curious to see if this has any association with the
+ages of participants since we know that certain age are more optimal for
+“peak performance” than others. We will separate the visualization by
+`sex` because while there an approximately equal number of males and
+females in the world, we know that access to athletics participation is
+not always equal which could be associated with participation rates by
+`age`.
 
 ### Approach
 
@@ -99,6 +115,19 @@ narrowing in on a size characteristic, we might pick a few select sports
 to focus in on (i.e. most popular sports) or group the sports based on
 common characteristics (ex: contact vs. non-contact, etc.) since there
 are 66 sports in the dataset.
+
+For our second plot, we are going to make a scatter plot of average
+`age` vs. `year` color mapped by `sex`. To start, we will find the
+average age of the participants by sex for each year. This will allow us
+to a not too crowded scatter plot since there are now only two
+observations (one for Male and one for Female) for each year. We choose
+a scatter plot because we believe it can best best represent the
+relationship and highlight potential trends. We considered a line plot
+but ultimately decided that the autonomy of each of the points (rather
+than them being connected) would better allow us to compare observations
+`year` by `year`. Since there is. unique context that surrounds each
+Olympics game, we feel as though a more year-specific approach could be
+more meaningful.
 
 ### Analysis
 
@@ -321,21 +350,19 @@ ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
 
 <img src="README_files/figure-gfm/fonts-and-plot-one-1.png" width="80%" />
 
-(2-3 code blocks, 2 figures, text/code comments as needed) In this
-section, provide the code that generates your plots. Use scale functions
-to provide nice axis labels and guides. You are welcome to use theme
-functions to customize the appearance of your plot, but you are not
-required to do so. All plots must be made with ggplot2. Do not use base
-R or lattice plotting functions.
+For our second plot, we will look at how `age` of Olympic participants
+by `sex` has changed with time.
 
-Plot 2 (Drew):
+We will re-load the CSV file to clear any manipulations done on the
+Olympics data frame to make the first plot.
 
-``` r
-# Create new calculated variables to represent physical build
-olympics <- olympics %>%
-  mutate(height_weight_ratio = height / weight,
-         BMI = 10000 * weight / (height * height))
-```
+Since the observations in the data are done on a per event competed in
+basis (rather than a per athlete basis), we will use `distinct()` to
+filter the data so we only have unique athletes represented each `year`.
+In other words, each `year` will contain a set of observations
+representing one athlete each. This will remove cases where the age of
+an athlete who competed in multiple events for a given Olympics is
+repeated multiple times.
 
 ``` r
 # keep only one observation per athlete
@@ -343,6 +370,10 @@ olympics <- olympics %>%
     distinct(id, year, .keep_all = TRUE) %>%
   mutate(sex = factor(sex, labels = c("Female", "Male")))
 ```
+
+Finally, we will make the plot showing the average yearly `age` of
+athletes by `sex`. We will drop observations in which the `age` is
+unknown.
 
 ``` r
 olympics %>%
@@ -358,7 +389,7 @@ olympics %>%
        title = "Average Yearly Age of Athletes By Sex",
        subtitle = "For athletes competing in selected Olympic sports from 1912-2020",
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
   theme_minimal() +
   theme(strip.background = element_blank(),
         strip.text.y = element_blank(),
@@ -380,58 +411,10 @@ olympics %>%
 
     ## `summarise()` has grouped output by 'year'. You can override using the `.groups` argument.
 
-<img src="README_files/figure-gfm/age-plot-1.png" width="80%" /> Tried
-median to see if it gets rid of outlier but does not
+<img src="README_files/figure-gfm/age-plot-1.png" width="80%" />
 
-For our second plot, we will look more closely at how size
-characteristics have changed over time, using `year` to make a time
-series line plots for these different values. In other words, we will
-plot one of the size characteristics (`height`, `weight`, or the
-height:weight ratio) on the y-axis vs. time on the x-axis. Lines by
-`sex` will connect the observations. We might also facet these plots by
-`age` to see if, for example, height of athletes has changed more or
-less over time for younger athletes vs. older athletes. In order to
-facet by `age`, we will have to make `age` a categorical variable by
-setting different cutoffs in which we group observations.
-
-The ages in the dataset range from 10 to 97 years old. Therefore, we
-will plot a histogram and do summary statistics to understand which
-cutoffs make the most sense given the data. Since athletes tend to be in
-their mid 20s, we’ll likely have smaller differences in ages in the
-20-30 age range whereas all athletes 40-97, for example, might be
-grouped together. However, as mentioned, this would depend on the
-distribution of the data.
-
-Like in Plot 1, we will evaluate which of `height`, `weight`, or the
-`height:weight` ratio provides the most insightful visualization.
-Ideally, the variable we choose in Plot 1 will be the same as in Plot 2;
-however, we understand creating visualizations is an iterative process
-are open to evaluating all options as we plot.
-
-For our second plot, we will look more closely at how size
-characteristics have changed over time, using `year` to make a time
-series line plots for these different values. In other words, we will
-plot one of the size characteristics (`height`, `weight`, or the
-height:weight ratio) on the y-axis vs. time on the x-axis. Lines by
-`sex` will connect the observations. We might also facet these plots by
-`age` to see if, for example, height of athletes has changed more or
-less over time for younger athletes vs. older athletes. In order to
-facet by `age`, we will have to make `age` a categorical variable by
-setting different cutoffs in which we group observations.
-
-The ages in the dataset range from 10 to 97 years old. Therefore, we
-will plot a histogram and do summary statistics to understand which
-cutoffs make the most sense given the data. Since athletes tend to be in
-their mid 20s, we’ll likely have smaller differences in ages in the
-20-30 age range whereas all athletes 40-97, for example, might be
-grouped together. However, as mentioned, this would depend on the
-distribution of the data.
-
-Like in Plot 1, we will evaluate which of `height`, `weight`, or the
-`height:weight` ratio provides the most insightful visualization.
-Ideally, the variable we choose in Plot 1 will be the same as in Plot 2;
-however, we understand creating visualizations is an iterative process
-are open to evaluating all options as we plot.
+The mean was used, rather than the median, of `age` as this better
+captures the range of ages of athletes for a given year.
 
 ### Discussion
 
@@ -439,19 +422,20 @@ are open to evaluating all options as we plot.
 your analysis. Identify any trends revealed (or not revealed) by the
 plots. Speculate about why the data looks the way it does.
 
-In all plots, men typically have a higher-centered distribution of `BMI`
-than women in the same sport, but other trends are more apparent by
-`category`. In the first plot, which includes wrestling, weightlifting,
-judo, and boxing, we see a strong right skew in most distributions. We
-interpret this as a reflection of the weight classes present in those
-sports, with many participants entering in lower weight classes, giving
-a lower center, but a non-insignificant number of athletes with BMIs
-higher than 30. However, there are fewer at these high BMIs, possibly
-due to the difficulty in maintaining athletic competitiveness at that
-proportion. Shooting and archery also have generally higher BMIs than
-other sports, and again a right-skew is observed in the distributions.
-This reflects those sports’ focus on hand-eye coordination, and thus
-athlete body type or height or weight are more variable.
+In the “Sex vs Body Mass Index Distribution” plots, men typically have a
+higher-centered distribution of `BMI` than women in the same sport, but
+other trends are more apparent by `category`. In the first plot, which
+includes wrestling, weightlifting, judo, and boxing, we see a strong
+right skew in most distributions. We interpret this as a reflection of
+the weight classes present in those sports, with many participants
+entering in lower weight classes, giving a lower center, but a
+non-insignificant number of athletes with BMIs higher than 30. However,
+there are fewer at these high BMIs, possibly due to the difficulty in
+maintaining athletic competitiveness at that proportion. Shooting and
+archery also have generally higher BMIs than other sports, and again a
+right-skew is observed in the distributions. This reflects those sports’
+focus on hand-eye coordination, and thus athlete body type or height or
+weight are more variable.
 
 The next group of sports, Athletics and Rowing, feature distributions
 with large variability on both sides. We interpret this as illustrating
@@ -463,6 +447,53 @@ speculate that the female gymnastics disciplines favor petite, nimble
 athletes, as opposed to the more upper-body strength oriented male
 apparatuses, which contribute to a higher average BMI for male Olympic
 gymnasts.
+
+Finally, for the “Average Yearly Age of Athletes By Sex” plot, it was
+found that the mean `age` of athletes by `sex` has changed pretty
+significantly over the years. For instance, the range of mean ages
+participating has converged pretty dramatically. Prior to the 1970s, the
+mean ages fluctuated in the 20-30 years old range with even some
+significant outliers hitting 35 and 50 years old in some cases. However,
+after the 1970s, it appears as though the mean ages converged in the
+25-27 years old range. This makes sense because, according to a
+Britannica article found
+[here](https://www.britannica.com/sports/Olympic-Games), the 1970s were
+a turning point for the games moving from allowing professional athletes
+to compete rather than just amateurs. The article also notes that it
+wasn’t until the 1980s that fully-fledged professional participation was
+permitted. With this information, we can speculate that there might be
+an association between the allowing of professional athletes and the
+convergence. Perhaps since most professional athletes are around 25
+years old (a point of peak physical ability of many), the mean age
+reflects the demographic shift (amateur to professional) of
+participants.
+
+In addition to age converging, it is interesting to note the difference
+between Males and Females. For all years but 3, the mean age of males
+was higher than females. Perhaps since males take longer to physically
+mature (puberty is at a later age), that could explain why their ability
+to compete at “peak perform” in a professional context is at a later
+age. Moreover, it’s possible that the extreme variability between mean
+ages of females prior to 1950 is the result of fewer females competing.
+With fewer competitors, it’s more likely that outlier events (extremely
+old participants) can skew the mean. For example, prior to 1920, there
+were 210 female participants versus 9,790 male participants as depicted
+below.
+
+``` r
+olympics %>%
+  filter(year <= 1920) %>%
+  count(sex)
+```
+
+    ## # A tibble: 2 × 2
+    ##   sex        n
+    ##   <fct>  <int>
+    ## 1 Female   210
+    ## 2 Male    9790
+
+These numbers are the total number of unique participants participating
+in each Olympics game prior to 1920.
 
 ## Question 2 \<- Update title to relate to the question you’re answering
 
@@ -543,6 +574,7 @@ flags <- tibble(noc = noc_regions$noc, region = noc_regions$region, flag = count
 ``` r
 olympics <- left_join(olympics, flags, by = "noc")
 
+<<<<<<< HEAD
 olympics
 ```
 
@@ -703,6 +735,21 @@ ggplot(usa_fil, aes(x = year, y = cumsum(total_winners), color = sport, group = 
 ```
 
 <img src="README_files/figure-gfm/unnamed-chunk-7-1.png" width="80%" />
+=======
+olympics_cty <- olympics %>%
+  group_by(region, sport, date) %>%
+  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop")
+```
+
+``` r
+olympics_cty %>%
+  filter(sport == "Gymnastics") %>%
+  ggplot(aes(x = date, y = total_score, group = region)) +
+  geom_line()
+```
+
+<img src="README_files/figure-gfm/unnamed-chunk-3-1.png" width="80%" />
+>>>>>>> 0e4936f6e8d5419e58eb8fa5dc5b0ab37f00134f
 
 In our first visualization, we will plot `medals_total` on the y-axis
 and `date` on the x-axis with lines grouped by `country` and faceting by
@@ -757,7 +804,11 @@ olympics_gdp %>%
 
     ## Warning: Removed 123 rows containing missing values (geom_point).
 
+<<<<<<< HEAD
 <img src="README_files/figure-gfm/unnamed-chunk-10-1.png" width="80%" />
+=======
+<img src="README_files/figure-gfm/unnamed-chunk-6-1.png" width="80%" />
+>>>>>>> 0e4936f6e8d5419e58eb8fa5dc5b0ab37f00134f
 
 ### Discussion
 
