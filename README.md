@@ -2,15 +2,64 @@ Project title
 ================
 by Mr. Palmer’s Penguins
 
+    ## 
+    ## Attaching package: 'lubridate'
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     date, intersect, setdiff, union
+
+    ## Rows: 271116 Columns: 15
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (10): name, sex, team, noc, games, season, city, sport, event, medal
+    ## dbl  (5): id, age, height, weight, year
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+    ## Rows: 230 Columns: 3
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (3): NOC, region, notes
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
 ## Introduction
 
-(1-2 paragraphs) Brief introduction to the dataset. You may repeat some
-of the information about the dataset provided in the introduction to the
-dataset on the TidyTuesday repository, paraphrasing on your own terms.
-Imagine that your project is a standalone document and the grader has no
-prior knowledge of the dataset.
+The set, which includes 15 variables and 271116 observations, provides
+insight into the athletes that competed in and the results of the
+Olympic games from Athens 1896 to Rio 2016. Each observation includes
+information about an athlete on a per event basis. Therefore, if an
+athlete competes in multiple different events, there will be multiple
+different observations reflecting each event an individual participated
+in. Each observation details medal results (Gold, Silver, Bronze, or
+NA), the athlete’s background (age, sex, height, weight, team they’re
+competing for, etc.), and context about the event (where and when it was
+held, season, sport the athlete competes in, etc.).
 
-## Does the optimal build of an Olympic athlete differ by sex or by sport? How have the trends in height and weight of Olympic athletes evolved over time?
+We chose this dataset because we think it can provide a lot of good
+insights into some of the trends at the Olympics over the past century
+as well as provide strong opportunities for our group to develop our
+visualization capabilities.
+
+This dataset was accessed on
+[kaggle.com](https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results)
+and includes data scraped in May 2018 from Sports Reference/OlympStats,
+sports statistics sites, by Randi Griffin, a Senior Data Scientist at
+Boston Consulting Group. Moreover, it was selected as part of the
+[TidyTuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021#readme7c70d95441aec295a1e92da9d71e2872877d663c)
+challenge on 7/27/21.
+
+## Do certain physical characteristics (such as body mass index, age, and sex) of Olympic participants differ by sport and/or change with time?
+
+Does the optimal build of an Olympic athlete differ by sex or by sport?
+How have the ages of these Olympic athletes evolved over time?
 
 ### Introduction
 
@@ -448,6 +497,54 @@ to provide nice axis labels and guides. You are welcome to use theme
 functions to customize the appearance of your plot, but you are not
 required to do so. All plots must be made with ggplot2. Do not use base
 R or lattice plotting functions.
+
+``` r
+# make appropriate date
+olympics %<>%
+  mutate(date = ifelse(season == "Winter", paste0(year, "-02-01"), paste0(year, "-07-01")),
+         date = ymd(date),
+         medal_winner = ifelse(is.na(medal), 0, 1),
+         medal_score = case_when(
+           medal == "Bronze" ~ 1,
+           medal == "Silver" ~ 2,
+           medal == "Gold" ~ 3,
+           TRUE ~ 0))
+```
+
+Next, we will mutate `medal` from a categorical variable with ‘Gold’,
+‘Silver’, ‘Bronze’, and NA as outcomes to either a numeric indicator
+(medal = 1 for any win and medal = 0 for no medal received) or a score
+that rewards the most points for Gold, then Silver, then Bronze. Through
+iterative visualization we will determine whether examining success only
+based on medal count or differentiating gold, silver, and bronze
+victories allows for a more meaningful display of trends. We will also
+later group the observations by region of National Olympic Committee, or
+`noc`, which reflects what we understand to be country identities today
+more accurately than `team` does. Merging in this [secondary
+dataset](https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results?select=noc_regions.csv)
+provided with the athlete-event level data by Kaggle will allow us to
+expand our country labeling from three-letter NOC abbreviations to
+complete country names. Additionally, the dataframe in the package
+[countrycode](https://vincentarelbundock.github.io/countrycode/) links
+countries by their names in various formats to their unicode flag
+emojis. Merging this data in will assist us with our visualizations of
+this question.
+
+After the above merging and necessary cleaning, we will group the data
+by `country`, `sport`, and `date` to compute a new variable called
+`medals_total` by taking the sum of either our medal-won indicator or
+our medal score assigned to differentiate gold, silver and bronze
+victories. These steps should allow us to begin an initial approach to
+visualization.
+
+In our first visualization, we will plot `medals_total` on the y-axis
+and `date` on the x-axis with lines grouped by `country` and faceting by
+`sport`. We will select just a few sports of interest to compare and use
+selective color mapping for countries of interest and transparency to
+strongly highlight a few countries and make the remaining lines
+indistinguishable in the background. If this technique remains visually
+overwhelming after prototyping our plot, we will filter to select just a
+few countries of interest in each sport and color map only those.
 
 ### Discussion
 
