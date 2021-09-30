@@ -386,7 +386,7 @@ olympics <- left_join(olympics, flags, by = "noc")
 
 ```{r}
 olympics %>%
-  filter(season == "Winter") %>%
+  filter(sport == "Gymnastics") %>%
   group_by(region, sport, date) %>%
   summarize(total_winners = sum(medal_winner), .groups = "drop") %>%
   ggplot(aes(x = date, y = total_winners, group = region)) +
