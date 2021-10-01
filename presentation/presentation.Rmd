@@ -330,7 +330,7 @@ olympics %>%
 
 ---
 class: inverse, middle, center
-# Does the economic status of a country, measured by GDP, make it more successful than others in the Olympics? Which countries are most successful, regardless of GDP, and in which sports do they achieve this success?
+# Which countries are most successful at the games and is this success potentially influenced by performance in particular sports or by the economic status of a country (as measured by GDP)?
 ---
 class: middle, center
 
