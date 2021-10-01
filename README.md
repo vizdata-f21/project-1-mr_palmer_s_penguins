@@ -490,28 +490,38 @@ in each Olympics game prior to 1920.
 
 ### Introduction
 
-The Olympics are a historic sports event that have been running for over
-a 125 years now, and to really grasp the full story of success at the
-Olympics, we want to first take a broader view and find out which
-countries have been most successful at all the Olympic games and in
-which sports. After conducting this research and creating relavant
-plots, we will continue on to testing a hypothesis we developed
-regarding a connection between a country’s Olympic success and its
-economic output. We are interested in testing this theory that a more
-economically powerful country will have more success at the Olympics as
-we often hear that these countries are able to provide the resources and
-facilities needed for their athletes to achieve great success.
+The Olympics are a historic sports event that have been run for over a
+125 years. To really grasp the full story of success at the Olympics, we
+want to take a broader view and look at which countries have been most
+successful throughout all the Olympic games and in which sports. Nations
+take pride in their overall medal counts– in modern times, Google tracks
+and publishes these medal counts. Despite popular interest in these
+metrics, fewer people are aware of their nations’ performance extending
+back over a century. Thus, we are intrigued by these cumulative wins and
+how countries have earned them in the long view.
 
-We will be using a variable we create, `medal_count`, for the first
-plot, and this will help us differentiate total Olympic success for
-different countries. We will then zoom in and look at one specific
-country’s success, using the `sport`, `noc`, and `year` variables along
-with `medal_count`. For the second plot, we will load in external data
-regarding the GDP of countries that have participated in the Olympics,
-and use this external data along with `medal_count` and `medal_score` to
-compare success to GDP. `Medal_score` will be another variable we create
-that weights the winning of a gold medal heavier than a silver medal,
-and a silver heavier than a bronze.
+We also hypothesize that an association exists between a country’s
+Olympic success and its economic output because of the investment often
+required to adequately train in many sports. Testing this theory, that
+economic power corresponds to greater success at the Olympics, will help
+us understand the relationship between national resources and overall
+athletes’ success. A nation’s resources can serve as both a boon and a
+challenge to its athletes. For example, American wealth helps train some
+of the best gymnasts in the world, but it also supports corruption and
+abuse in the organization that is USA Gymnastics. To investigate this,
+we will merge in external data from the Maddison Project Database, a
+compilation of researchers’ work estimating economic growth for
+individual countries ([Bolt and van
+Zanden, 2020](https://ourworldindata.org/grapher/gdp-per-capita-maddison-2020)).
+
+We will be using a variable we create, `total_winners`, to visualize
+total Olympic success for different countries. This variable represents
+the number of medals won by each country in each Olympics. We will then
+zoom in and look at one specific country’s success, using the `sport`,
+`noc`, and `year` variables along with `total_winners`. For the second
+plot, we will load in external historical GDP per capita data and use
+this external data along with `total_winners` to visualize the
+relationship between a country’s wins and its economic indicators.
 
 ### Approach
 
@@ -529,44 +539,29 @@ will then plot out the results of these sports over time to see how
 their contribution to this country’s medal count may have changed over
 the years.
 
-For our second visualization,
+For our second visualization, we will create a scatter plot with
+`gdp_per_capita` on the x axis and `medals_total` on the y axis,
+faceting and animating by year. We plan to highlight interesting
+outliers with their country names, and we will visualize the winter and
+summer Olympics separately because of the different natures of these
+events (for example, because overall medal counts are much higher in the
+summer games than the winter games). Although we plan to look at data
+over time, a faceted or animated scatter plot will preserve all the
+information in our data (importantly our two numeric variables,
+`gdp_per_capita` and `medals_total`), where a line graph would not. We
+will use a text layer to annotate outliers, but a plot made of entirely
+`geom_text()` would overwhelm the reader. Also, to maintain granularity,
+since individual country identities are important to us, a scatter plot
+will serve us better than a sole model or smooth line.
 
 ### Analysis
 
-Above we have loaded the olympic dataset and also the full country names
-into the noc\_regions object.
-
 ``` r
-olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
-```
+# reload the Olympic dataset and also the full country names into the noc_regions object
+olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"), show_col_types = FALSE)
+noc_regions <- read_csv(file = paste0(here::here(), "/data/noc_regions.csv"), show_col_types = FALSE)
 
-    ## Rows: 271116 Columns: 15
-
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr (10): name, sex, team, noc, games, season, city, sport, event, medal
-    ## dbl  (5): id, age, height, weight, year
-
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
-noc_regions <- read_csv(file = paste0(here::here(), "/data/noc_regions.csv"))
-```
-
-    ## Rows: 230 Columns: 3
-
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr (3): NOC, region, notes
-
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
-# make appropriate date
+# make appropriate date for chronological plotting and convert characters in medal wins to numeric values
 olympics %<>%
   mutate(date = ifelse(season == "Winter", paste0(year, "-02-01"), paste0(year, "-07-01")),
          date = ymd(date),
@@ -579,15 +574,16 @@ olympics %<>%
 
 noc_regions %<>%
   janitor::clean_names() %>%
+  # fix typo
   mutate(region = ifelse(region == "Boliva", "Bolivia", region))
 
-flags <- tibble(noc = noc_regions$noc, region = noc_regions$region, flag = countrycode(noc_regions$region, 'country.name', 'unicode.symbol'))
-```
+olympics <- left_join(olympics, noc_regions, by = "noc")
 
-    ## Warning in countrycode_convert(sourcevar = sourcevar, origin = origin, destination = dest, : Some values were not matched unambiguously: Individual Olympic Athletes, Micronesia
-
-``` r
-olympics <- left_join(olympics, flags, by = "noc")
+olympics_filter <- olympics %>%
+  filter(season == "Summer") %>%
+  group_by(region) %>%
+  dplyr::summarise(total_winners = sum(medal_winner), total_score = sum(medal_score))%>%
+  filter(total_winners >= 910)
 ```
 
 The data wrangling step above involves adding the month and day to the
@@ -595,35 +591,22 @@ dates of our summer and winter olympic data to help us plot it as time
 series data, should we need to do this. We then clean the noc\_regions
 data.
 
-``` r
-olympics_filter <- olympics %>%
-  filter(season == "Summer") %>%
-  group_by(noc) %>%
-  dplyr::summarise(total_winners = sum(medal_winner), total_score = sum(medal_score))%>%
-  filter(total_winners >= 910)
-```
-
 We have now filtered the data to be used in our first visualization for
 only Summer Olympic success, as different countries may be successful in
 different seasons. For this visualization, we are interested in the
-Summer Olympics. We then summarize the total medals as the sum of the
-`medal_winner` column, which represents 1 or 0 for if an athlete won a
-medal or not, and add up the `medal_score` column to get a total score
-that weights gold, silver and bronze medals.
+summer Olympics.
 
-\#\#\#Plot 1
+### Plot 1
 
 ``` r
-ggplot(olympics_filter, aes(x = reorder(noc, total_winners), y = total_winners, fill = noc, color = noc))+
-  geom_bar(stat='identity')+
+ggplot(olympics_filter, aes(x = reorder(region, total_winners), y = total_winners)) +
+  geom_bar(stat = "identity", fill = "#5CC0AB") +
   labs(x = "Country",
        y = "Medal Count",
        title = "All-time Summer Olympic Medal Counts",
        subtitle = "For the top 10 most winningest countries in history",
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
   theme_minimal() +
-  scale_color_manual(values = c("#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB")) +
-  scale_fill_manual(values = c("#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB","#5CC0AB")) +
   theme(strip.background = element_blank(),
         strip.text.y = element_blank(),
         panel.spacing.y = unit(0.4, "cm"),
@@ -637,28 +620,24 @@ ggplot(olympics_filter, aes(x = reorder(noc, total_winners), y = total_winners, 
         legend.position = "none")
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-3-1.png" width="80%" />
+<img src="README_files/figure-gfm/cumulative-medal-count-plot-1.png" width="80%" />
 
 Here is our first plot, which represents the 10 countries that have won
 the most medals in Summer Olympic history.
+
+After taking a closer look at the data used to create the first
+visualization, we decided to represent the contribution of the USA’s two
+most successful sports to our medal count at each summer Olympic games
+over time. We filter by the country code “USA” and by sport and year,
+filtering for only swimming and athletics.
 
 ``` r
 usa_fil <- olympics %>%
   filter(noc == "USA") %>%
   group_by(sport, year)%>%
-  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score))%>%
+  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop")%>%
   filter(sport %in% c("Swimming", "Athletics"))
-```
 
-    ## `summarise()` has grouped output by 'sport'. You can override using the `.groups` argument.
-
-After taking a closer look at the data used to create the first
-visualization, we decided to represent the contribution of the USA’s two
-most successful sports to our medal count at each Summer olympic games
-over time. We filter by the country code “USA” and by sport and year,
-filtering for only swimming and athletics.
-
-``` r
 ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport))+
   geom_line()+
   geom_point()+
@@ -668,7 +647,7 @@ ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport))+
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
   theme_minimal() +
   scale_color_manual(values = c("#7B38EC","#5CC0AB"))+
-  scale_x_continuous(limits = c(1896,2016), breaks = seq(1896, 2016, by = 8))+
+  scale_x_continuous(limits = c(1896,2016), breaks = seq(1896, 2016, by = 16))+
   theme(strip.background = element_blank(),
         strip.text.y = element_blank(),
         panel.spacing.y = unit(0.4, "cm"),
@@ -687,7 +666,7 @@ ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport))+
         legend.key.size = unit(0.5, "cm"))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-5-1.png" width="80%" />
+<img src="README_files/figure-gfm/usa-victories-plot-1.png" width="80%" />
 
 Here we have plotted the number of medals won in Athletics and Swimming
 at each Summer Olympic games over the years.
@@ -695,23 +674,11 @@ at each Summer Olympic games over the years.
 #### Plot 2
 
 ``` r
-#detach(package:plyr, unload = TRUE)
-gdp <- read_csv("data/gdp-per-capita-maddison-2020.csv")
+detach(package:plyr, unload = TRUE)
+gdp <- read_csv("data/gdp-per-capita-maddison-2020.csv", show_col_types = FALSE)
 ```
 
     ## Warning: One or more parsing issues, see `problems()` for details
-
-    ## Rows: 19878 Columns: 5
-
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr (2): Entity, Code
-    ## dbl (2): Year, GDP per capita
-    ## lgl (1): 145446-annotations
-
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 ``` r
 gdp %<>%
@@ -727,12 +694,10 @@ gdp %<>%
     entity == "Czechia" ~ "Czech Republic",
     TRUE ~ entity
   ))
-```
 
-``` r
 olympics_gdp <- olympics %>%
-  group_by(region, date, season, flag) %>%
-  dplyr::summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop") %>%
+  group_by(region, date, season) %>%
+  dplyr::summarise(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop") %>%
   rename(entity = region) %>%
   mutate(year = year(date),
          summer_highlight = ifelse(total_winners > 100, T, F),
@@ -740,6 +705,9 @@ olympics_gdp <- olympics %>%
   left_join(gdp, by = c("entity", "year")) %>%
   rename(country = entity)
 ```
+
+We load our historical GDP data and join it to Olympic victory data
+after cleaning country naming discrepancies between the two.
 
 ``` r
 winter_highlight <- olympics_gdp %>%
@@ -782,7 +750,7 @@ olympics_gdp %>%
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-8-1.png" width="80%" />
+<img src="README_files/figure-gfm/faceted-gdp-plots-1.png" width="80%" />
 
 ``` r
 summer_highlight <- olympics_gdp %>%
@@ -826,7 +794,7 @@ olympics_gdp %>%
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-9-1.png" width="80%" />
+<img src="README_files/figure-gfm/faceted-gdp-plots-2.png" width="80%" />
 
 ``` r
 olympics_gdp %>%
@@ -839,7 +807,7 @@ olympics_gdp %>%
   facet_wrap(~year, ncol = 1) +
   scale_color_manual(values = c("#5CC0AB", "#7B38EC")) +
   labs(title = "Total Medals Won vs. GDP per capita",
-       subtitle = "Winter Olympics, 2004-2016",
+       subtitle = "Summer Olympics, 2004-2016",
        y = "Total Medals Won",
        x = "GDP per capita (USD)",
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
@@ -867,7 +835,7 @@ olympics_gdp %>%
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-9-2.png" width="80%" />
+<img src="README_files/figure-gfm/faceted-gdp-plots-3.png" width="80%" />
 
 ``` r
 winter_highlight <- olympics_gdp %>%
@@ -876,7 +844,7 @@ winter_highlight <- olympics_gdp %>%
 winter_gdp <- olympics_gdp %>%
   filter(!is.na(gdp_per_capita), season == "Winter", year %in% c(1950:2020)) %>%
   ggplot(aes(x = gdp_per_capita, y = total_winners)) +
-  geom_point(aes(color = winter_highlight), alpha = .5, size = .75, show.legend = FALSE) +
+  geom_point(aes(color = winter_highlight), alpha = .5, size = 2, show.legend = FALSE) +
   geom_text(data = winter_highlight, aes(x = gdp_per_capita, y = total_winners, label = country),
                                         color = "#7B38EC", size = 4, family = "Oswald", vjust = .2) +
   scale_color_manual(values = c("#5CC0AB", "#7B38EC")) +
@@ -897,20 +865,20 @@ winter_gdp <- olympics_gdp %>%
         legend.background = element_rect(size = 0.3),
         legend.margin = margin(1, 5, 5, 5),
         legend.key.size = unit(0.5, "cm"),
-        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
-        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
-        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+        plot.title = element_text(family = "Oswald", color = "#092260", size = 17, hjust = 0.5),
+        plot.caption = element_text(family = "Oswald", color = "#092260", size = 8),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 11, hjust = 0.5),
         axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
-        axis.text.y = element_text(family = "Oswald", color = "#092260", size = 10),
-        axis.title.y = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.text = element_text(family = "Oswald", color = "#092260", size = 14)) +
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 11),
+        axis.text.y = element_text(family = "Oswald", color = "#092260", size = 7),
+        axis.title.y = element_text(family = "Oswald", color = "#092260", size = 11),
+        legend.text = element_text(family = "Oswald", color = "#092260", size = 11)) +
   transition_states(year, transition_length = 1, state_length = .3)
 
-animate(winter_gdp, duration = 20, fps = 10, renderer = gifski_renderer())
+animate(winter_gdp, duration = 16, fps = 10, renderer = gifski_renderer())
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-10-1.gif" width="80%" />
+<img src="README_files/figure-gfm/winter-animation-1.gif" width="80%" />
 
 ### Discussion
 
