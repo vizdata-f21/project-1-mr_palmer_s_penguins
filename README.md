@@ -1041,19 +1041,15 @@ Our presentation can be found [here](presentation/presentation.html).
 
 ## Data
 
-Include a citation for your data here. See
-<http://libraryguides.vu.edu.au/c.php?g=386501&p=4347840> for guidance
-on proper citation for datasets. If you got your data off the web, make
-sure to note the retrieval date.
-
 Sports Reference 2018, *120 years of Olympic history: athletes and
 results*, electronic dataset, Kaggle, viewed 16 September 2021,
 <https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results>
 
-## References
+Bolt, J, van Zanden J. L. 2020, *GDP per capita, 1820-2018*, electronic
+dataset, OurWorldInData, viewed 30 September 2021,
+<https://ourworldindata.org/grapher/gdp-per-capita-maddison-2020>
 
-List any references here. You should, at a minimum, list your data
-source.
+## References
 
 Sports Reference 2018, *120 years of Olympic history: athletes and
 results*, electronic dataset, Kaggle, viewed 16 September 2021,
@@ -1065,50 +1061,50 @@ dataset, OurWorldInData, viewed 30 September 2021,
 
 #### Packages Used
 
-Claus O. Wilke (2020). *ggtext: Improved Text Rendering Support for
+Claus O. Wilke 2020, *ggtext: Improved Text Rendering Support for
 ‘ggplot2’.*, R package version 0.1.1.
 <https://CRAN.R-project.org/package=ggtext>
 
-Garrett Grolemund, Hadley Wickham (2011). *Dates and Times Made Easy
-with lubridate.*, Journal of Statistical Software, 40(3), 1-25.
+Garrett Grolemund, Hadley Wickham 2011, *Dates and Times Made Easy with
+lubridate.*, Journal of Statistical Software, 40(3), 1-25.
 <https://www.jstatsoft.org/v40/i03/>
 
-Hadley Wickham (2011). *The Split-Apply-Combine Strategy for Data
+Hadley Wickham 2011, *The Split-Apply-Combine Strategy for Data
 Analysis.*, Journal of Statistical Software, 40(1), 1-29.
 <http://www.jstatsoft.org/v40/i01/>
 
-Hadley Wickham, Romain François, Lionel Henry and Kirill Müller (2021).
+Hadley Wickham, Romain François, Lionel Henry and Kirill Müller 2021,
 *dplyr: A Grammar of Data Manipulation.*, <https://dplyr.tidyverse.org>,
 <https://github.com/tidyverse/dplyr>
 
-Hadley Wickham and Dana Seidel (2020). *scales: Scale Functions for
+Hadley Wickham and Dana Seidel 2020, *scales: Scale Functions for
 Visualization.*, <https://scales.r-lib.org>,
 <https://github.com/r-lib/scales>
 
-Kamil Slowikowski (2021). *ggrepel: Automatically Position
-Non-Overlapping Text Labels with ‘ggplot2’.*, R package version 0.9.1.
+Kamil Slowikowski 2021, *ggrepel: Automatically Position Non-Overlapping
+Text Labels with ‘ggplot2’.*, R package version 0.9.1.
 <https://github.com/slowkow/ggrepel>
 
-Thomas Lin Pedersen and David Robinson (2020). *gganimate: A Grammar of
+Thomas Lin Pedersen and David Robinson 2020, *gganimate: A Grammar of
 Animated Graphics.*, <https://gganimate.com>,
 <https://github.com/thomasp85/gganimate>
 
-Jeroen Ooms (2021). *gifski: Highest Quality GIF Encoder.*,
+Jeroen Ooms 2021, *gifski: Highest Quality GIF Encoder.*,
 <https://gif.ski/> (upstream), <https://github.com/r-rust/gifski>
 (devel).
 
-Stefan Milton Bache and Hadley Wickham (2020). *magrittr: A Forward-Pipe
+Stefan Milton Bache and Hadley Wickham 2020, *magrittr: A Forward-Pipe
 Operator for R.*, <https://magrittr.tidyverse.org>,
 <https://github.com/tidyverse/magrittr>
 
-Wickham et al., (2019). *Welcome to the tidyverse.*, Journal of Open
+Wickham et al., 2019, *Welcome to the tidyverse.*, Journal of Open
 Source Software, 4(43), 1686, <https://doi.org/10.21105/joss.01686>
 
-Yixuan Qiu et al., (2021). *showtext: Using Fonts More Easily in R
+Yixuan Qiu et al., 2021, *showtext: Using Fonts More Easily in R
 Graphs.*, R package version 0.9-4.
 <https://CRAN.R-project.org/package=showtext>
 
-[BMI](https://en.wikipedia.org/wiki/Body_mass_index)
+[BMI](http=s://en.wikipedia.org/wiki/Body_mass_index)
 
 We found a citation for the Tokyo 2020 Olympics logo font
 [here](https://www.reddit.com/r/identifythisfont/comments/4ig8ua/font_used_on_the_tokyo_2020_logo/)
