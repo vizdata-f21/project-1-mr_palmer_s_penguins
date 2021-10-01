@@ -393,7 +393,7 @@ The data wrangling step above involves adding the month and day to the dates of 
 olympics_filter <- olympics %>%
   filter(season == "Summer") %>%
   group_by(noc) %>%
-  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score))%>%
+  dplyr::summarise(total_winners = sum(medal_winner), total_score = sum(medal_score))%>%
   filter(total_winners >= 910)
 
 ```
@@ -453,6 +453,7 @@ ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport))+
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
   theme_minimal() +
   scale_color_manual(values = c("#7B38EC","#5CC0AB"))+
+  scale_x_continuous(limits = c(1896,2016), breaks = seq(1896, 2016, by = 8))+
   theme(strip.background = element_blank(),
         strip.text.y = element_blank(),
         panel.spacing.y = unit(0.4, "cm"),
