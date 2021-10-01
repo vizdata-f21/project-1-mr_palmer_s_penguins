@@ -1,6 +1,6 @@
 ---
-title: "Presentation title"
-subtitle: "Presentation subtitle (if any)"
+title: "Beyond the Rings:"
+subtitle: "Analyzing Olympic Athlete and Medal-Winning Country Characteristics"
 author: "Mr. Palmer's Penguins <br> Sarab Bhasin, Lillian Clark, Evan Dragich, Drew Flanagan"
 institute: "Duke University"
 date: "`r Sys.Date()`"
@@ -48,11 +48,11 @@ style_xaringan(
 
 class: inverse, middle, center
 
-# Using xaringan
+# Introduction
 
 ---
 
-## xaringan
+## Olympics Dataset
 
 - The presentation is created using the `xaringan` package
 
@@ -63,8 +63,11 @@ class: inverse, middle, center
 - Like this
 
 ---
+class: inverse, middle, center
+# Do certain physical characteristics (such as body mass index, age, and sex) of Olympic participants differ by sport and/or change with time?
 
-## Layouts
+---
+## Understanding Physical Characteristics of Olympians
 
 You can use plain text
 
@@ -84,7 +87,7 @@ or text in two columns $^*$
 
 ---
 
-## Code
+## Understanding Physical Characteristics of Olympians
 
 ```{r boring-regression}
 # a boring regression
@@ -94,8 +97,12 @@ glance(model)
 ```
 
 ---
+class: inverse, middle, center
+# Does the economic status of a country, measured by GDP, make it more successful than others in the Olympics? Which countries are most successful, regardless of GDP, and in which sports do they achieve this success?
 
-## Plots
+---
+
+## Examining Medal-Winning Countries
 
 ```{r recode-species, echo = FALSE}
 # In this chunk I'm doing a bunch of analysis that I don't want to present 
@@ -115,7 +122,7 @@ ggplot(penguins_modified, aes(x = flipper_length_mm, y = body_mass_g, color = sp
 
 ---
 
-## Plot and text
+## References
 
 .pull-left[
 - Some text
