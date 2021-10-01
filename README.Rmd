@@ -391,7 +391,7 @@ olympics_filter <- olympics %>%
 
 We have now filtered the data to be used in our first visualization for only Summer Olympic success, as different countries may be successful in different seasons. For this visualization, we are interested in the Summer Olympics. We then summarize the total medals as the sum of the `medal_winner` column, which represents 1 or 0 for if an athlete won a medal or not, and add up the `medal_score` column to get a total score that weights gold, silver and bronze medals.
 
-### Plot 1
+###Plot 1
 
 ```{r}
 
@@ -468,7 +468,8 @@ Here we have plotted the number of medals won in Athletics and Swimming at each 
 
 #### Plot 2
 
-```{r wrangle-gdp-plot}
+```{r}
+detach(package:plyr, unload = TRUE)
 gdp <- read_csv("data/gdp-per-capita-maddison-2020.csv")
 
 gdp %<>%
@@ -484,7 +485,9 @@ gdp %<>%
     entity == "Czechia" ~ "Czech Republic",
     TRUE ~ entity
   ))
+```
 
+```{r}
 olympics_gdp <- olympics %>%
   group_by(region, date, season, flag) %>%
   summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop") %>%
