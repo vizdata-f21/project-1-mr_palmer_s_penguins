@@ -518,7 +518,7 @@ olympics %>%
 These numbers are the total number of unique participants participating
 in each Olympics game prior to 1920.
 
-## Question 2 \<- Examining Medal-Winning Countries
+## Examining Medal-Winning Countries
 
 ### Introduction
 
@@ -718,13 +718,10 @@ at each Summer Olympic games over the years.
 #### Plot 2
 
 ``` r
+# warnings suppressed due to parsing failures of gdp data which do not affect the data of our concern
 detach(package:plyr, unload = TRUE)
 gdp <- read_csv("data/gdp-per-capita-maddison-2020.csv", show_col_types = FALSE)
-```
 
-    ## Warning: One or more parsing issues, see `problems()` for details
-
-``` r
 gdp %<>%
   janitor::clean_names() %>%
   mutate(entity = case_when(
@@ -1085,17 +1082,21 @@ Hadley Wickham and Dana Seidel 2020, *scales: Scale Functions for
 Visualization.*, <https://scales.r-lib.org>,
 <https://github.com/r-lib/scales>
 
+Jeroen Ooms 2021, *gifski: Highest Quality GIF Encoder.*,
+<https://gif.ski/> (upstream), <https://github.com/r-rust/gifski>
+(devel).
+
 Kamil Slowikowski 2021, *ggrepel: Automatically Position Non-Overlapping
 Text Labels with ‘ggplot2’.*, R package version 0.9.1.
 <https://github.com/slowkow/ggrepel>
 
+Kirill Müller and Lorenz Walthert 2021, *styler: Non-Invasive Pretty
+Printing of R Code.* <https://github.com/r-lib/styler>,
+<https://styler.r-lib.org>
+
 Thomas Lin Pedersen and David Robinson 2020, *gganimate: A Grammar of
 Animated Graphics.*, <https://gganimate.com>,
 <https://github.com/thomasp85/gganimate>
-
-Jeroen Ooms 2021, *gifski: Highest Quality GIF Encoder.*,
-<https://gif.ski/> (upstream), <https://github.com/r-rust/gifski>
-(devel).
 
 Stefan Milton Bache and Hadley Wickham 2020, *magrittr: A Forward-Pipe
 Operator for R.*, <https://magrittr.tidyverse.org>,
@@ -1110,29 +1111,32 @@ Graphs.*, R package version 0.9-4.
 
 #### Other References
 
-[BMI](http=s://en.wikipedia.org/wiki/Body_mass_index)
+#### Coding & Outside Research
 
-We found a citation for the Tokyo 2020 Olympics logo font
-[here](https://www.reddit.com/r/identifythisfont/comments/4ig8ua/font_used_on_the_tokyo_2020_logo/)
-and were pointed to an open-source alternative
-[here](https://graphicdesign.stackexchange.com/questions/7178/is-there-a-din-font-free-alternative).
+Wikipedia Contributors, 2019, *Body mass index*. \[online\] Wikipedia.
+Available at: <https://en.wikipedia.org/wiki/Body_mass_index>
 
-We got the hex code used in plot text manually from that logo source. We
-chose the hex codes for our favorite gender color mapping from Telegraph
-2018 [here](https://blog.datawrapper.de/gendercolor/).
+CruzeiroDoSul, 2016, *Font used on the Tokyo 2020 logo* \[online\]
+Available at:
+<https://www.reddit.com/r/identifythisfont/comments/4ig8ua/font_used_on_the_tokyo_2020_logo/>
+\[Accessed 1 Oct. 2021\].
 
-according to a Britannica article found
-[here](https://www.britannica.com/sports/Olympic-Games)
+Graphic Design Stack Exchange, 2014, *web safe - Is there a DIN font
+free alternative? * \[online\] Available at:
+<https://graphicdesign.stackexchange.com/questions/7178/is-there-a-din-font-free-alternative>
+\[Accessed 1 Oct. 2021\].
 
-puberty is at a later age as described
-[here](https://www.nhs.uk/live-well/sexual-health/stages-of-puberty-what-happens-to-boys-and-girls/)
+GmbH, D, 2018, *An alternative to pink & blue: Colors for gender data*
+\[online\] Chartable. Available at:
+<https://blog.datawrapper.de/gendercolor/>
 
-Kirill Müller and Lorenz Walthert 2021, *styler: Non-Invasive Pretty
-Printing of R Code.* <https://github.com/r-lib/styler>,
-<https://styler.r-lib.org>
-
-We learned more context for China’s historical participation in the
-Olympics games here:
+Young, D.C. and Abrahams, H.M., 2019, *Olympic Games | History,
+Locations, & Winners* In: Encyclopædia Britannica. \[online\] Available
+at: <https://www.britannica.com/sports/Olympic-Games>
 
 ChinaPower Project 2018, *How dominant is China at the Olympic Games?*
+\[online\]. Available at:
 <https://chinapower.csis.org/dominant-china-olympic-games/>
+
+NHS Choices, 2018, *Sexual health* \[online\] NHS. Available at:
+<https://www.nhs.uk/live-well/sexual-health/stages-of-puberty-what-happens-to-boys-and-girls/>

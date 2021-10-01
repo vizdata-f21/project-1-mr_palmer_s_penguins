@@ -23,6 +23,18 @@ library(tidymodels)
 library(palmerpenguins)
 library(knitr)
 library(xaringanthemer)
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(gganimate))
+suppressPackageStartupMessages(library(ggrepel))
+suppressPackageStartupMessages(library(plyr))
+suppressPackageStartupMessages(library(gifski))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(scales))
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(showtext)) # cool fonts
+suppressPackageStartupMessages(library(magrittr))
+suppressPackageStartupMessages(library(ggtext)) # superscript in plot labels
+suppressPackageStartupMessages(library(styler))
 ```
 
 ```{r setup, include=FALSE}
@@ -37,172 +49,563 @@ knitr::opts_chunk$set(
 ```
 
 ```{r load-data, include=FALSE}
-# Load your data here
+olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"), show_col_types = FALSE)
 ```
 
 ```{r style-slides, echo = FALSE}
 style_xaringan(
-  title_slide_background_image = "img/watercolour_sys02_img34_teacup-ocean.jpg"
+  title_slide_background_image = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Olympic_rings_without_rims.svg/1200px-Olympic_rings_without_rims.svg.png"
 )
 ```
 
 class: inverse, middle, center
-
-# Introduction
-
----
-
-## Olympics Dataset
-
-- The presentation is created using the `xaringan` package
-
-- Use `---` to separate slides and `--` for incremental builds
-
---
-
-- Like this
-
----
-class: inverse, middle, center
 # Do certain physical characteristics (such as body mass index, age, and sex) of Olympic participants differ by sport and/or change with time?
 
 ---
-## Understanding Physical Characteristics of Olympians
+class: middle, center
+``` {r wrangling-plot-one, echo = FALSE}
+# Create new calculated variables to represent physical build
+olympics <- olympics %>%
+  mutate(
+    height_weight_ratio = height / weight,
+    BMI = 10000 * weight / (height * height)
+  )
 
-You can use plain text
+# load Olympic font
+font_add_google(name = "Oswald")
+showtext_auto()
+```
 
-- or bullet points
+``` {r mutate-category, echo = FALSE}
+# create variable to represent category of sport
+# keep only one observation per athlete
+olympics <- olympics %>%
+  distinct(id, .keep_all = TRUE) %>%
+  mutate(sex = factor(sex, labels = c("Female", "Male"))) %>%
+  filter(sport %in% c("Boxing", "Judo", "Weightlifting", "Wrestling", "Gymnastics", "Trampolining", "Archery", "Shooting", "Athletics", "Rowing")) %>%
+  mutate(
+    category = case_when(
+      sport %in% c("Boxing", "Judo", "Weightlifting", "Wrestling") ~ "weightclass",
+      sport %in% c("Gymnastics", "Trampolining") ~ "acrobatic",
+      sport %in% c("Archery", "Shooting") ~ "coordination",
+      TRUE ~ "diverse"
+    ),
+    category = factor(category, levels = c("acrobatic", "diverse", "coordination", "weightclass"))
+  )
 
-.pull-left[
-or text in two columns $^*$
-]
-.pull-right[
-- like
-- this
-]
+# create separate dataframes for each of these categories
+olympics_weightclass <- olympics %>%
+  filter(category == "weightclass")
 
-.footnote[
-[*] And add footnotes
-]
+olympics_coordination <- olympics %>%
+  filter(category == "coordination")
+
+olympics_diverse <- olympics %>%
+  filter(category == "diverse")
+
+olympics_acrobatic <- olympics %>%
+  filter(category == "acrobatic")
+```
+
+``` {r plot-weightclass, warning = FALSE, echo = FALSE, out.width = "90%"}
+ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = sex)) +
+  geom_boxplot(position = position_dodge2(10)) +
+  labs(
+    x = "Body Mass Index (kg/m<sup>2</sup>)",
+    y = NULL,
+    color = "Sex",
+    title = "Sex vs Body Mass Index Distribution",
+    subtitle = "For athletes competing in weightclass-based Olympic sports", ,
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  facet_grid(category ~ ., scales = "free_y", space = "free") +
+  theme_minimal() +
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.title = element_blank(),
+    legend.position = c(0.9, 0.67),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm")
+  )
+```
+---
+class: middle, center
+``` {r plot-coordination, warning = FALSE, echo = FALSE, out.width = "90%"}
+ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex)) +
+  geom_boxplot(position = position_dodge2(10)) +
+  labs(
+    x = "Body Mass Index (kg/m<sup>2</sup>)",
+    y = NULL,
+    color = "Sex",
+    title = "Sex vs Body Mass Index Distribution",
+    subtitle = "For athletes competing in coordination-based Olympic sports", ,
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  facet_grid(category ~ ., scales = "free_y", space = "free") +
+  theme_minimal() +
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.title = element_blank(),
+    legend.position = c(0.9, 0.25),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm")
+  )
+```
+---
+class: middle, center
+``` {r plot-diverse, warning = FALSE, echo = FALSE, out.width = "90%"}
+ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
+  geom_boxplot(position = position_dodge2(10)) +
+  labs(
+    x = "Body Mass Index (kg/m<sup>2</sup>)",
+    y = NULL,
+    color = "Sex",
+    title = "Sex vs Body Mass Index Distribution",
+    subtitle = "For athletes competing in Olympic sports which encompass many skills", ,
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  facet_grid(category ~ ., scales = "free_y", space = "free") +
+  theme_minimal() +
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.title = element_blank(),
+    legend.position = c(0.9, 0.9),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm")
+  )
+```
+---
+class: middle, center
+``` {r plot-acrobatic, warning = FALSE, echo = FALSE, out.width = "90%"}
+ggplot(olympics_acrobatic, mapping = aes(y = sport, x = BMI, color = sex)) +
+  geom_boxplot(position = position_dodge2(10)) +
+  labs(
+    x = "Body Mass Index (kg/m<sup>2</sup>)",
+    y = NULL,
+    color = "Sex",
+    title = "Sex vs Body Mass Index Distribution",
+    subtitle = "For athletes competing in acrobatic Olympic sports", ,
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  facet_grid(category ~ ., scales = "free_y", space = "free") +
+  theme_minimal() +
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.title = element_blank(),
+    legend.position = c(0.9, 0.77),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm")
+  )
+```
+---
+class: middle, center
+``` {r fonts-and-plot-one, warning = FALSE, echo = FALSE, out.width = "90%"}
+ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
+  geom_boxplot(position = position_dodge2(10)) +
+  labs(
+    x = "Body Mass Index (kg/m<sup>2</sup>)",
+    y = NULL,
+    color = "Sex",
+    title = "Sex vs Body Mass Index Distribution",
+    subtitle = "For athletes competing in selected Olympic sports from 1912-2020", ,
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  facet_grid(category ~ ., scales = "free_y", space = "free") +
+  theme_minimal() +
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260"),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.title = element_blank(),
+    legend.position = c(0.9, 0.77),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm")
+  )
+```
 
 ---
+class: middle, center
+```{r load-data-2, echo = FALSE}
+# load data here
+olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"), show_col_types = FALSE)
+```
 
-## Understanding Physical Characteristics of Olympians
+```{r distinct-year, echo = FALSE}
+# keep only one observation per athlete
+olympics <- olympics %>%
+  distinct(id, year, .keep_all = TRUE) %>%
+  mutate(sex = factor(sex, labels = c("Female", "Male")))
+```
 
-```{r boring-regression}
-# a boring regression
-model <- lm(dist ~ speed, data = cars)
-tidy(model)
-glance(model)
+```{r age-plot, echo = FALSE, out.width = "90%"}
+olympics %>%
+  drop_na(age) %>%
+  group_by(year, sex) %>%
+  dplyr::summarise(avg_age = mean(age), .groups = "drop_last") %>%
+  arrange(desc(sex)) %>%
+  ggplot(mapping = aes(y = avg_age, x = year)) +
+  geom_point(aes(color = sex)) +
+  labs(
+    x = "Year",
+    y = "Age",
+    color = "Sex",
+    title = "Average Yearly Age of Athletes By Sex",
+    subtitle = "For athletes competing in selected Olympic sports from 1912-2020",
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
+  theme_minimal() +
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+    axis.title.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260"),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.title = element_blank(),
+    legend.position = c(0.8, 0.68),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm")
+  )
 ```
 
 ---
 class: inverse, middle, center
 # Does the economic status of a country, measured by GDP, make it more successful than others in the Olympics? Which countries are most successful, regardless of GDP, and in which sports do they achieve this success?
-
 ---
+class: middle, center
 
-## Examining Medal-Winning Countries
+```{r wrangling-medals, echo = FALSE}
+# reload the Olympic dataset and also the full country names into the noc_regions object
+olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"), show_col_types = FALSE)
+noc_regions <- read_csv(file = paste0(here::here(), "/data/noc_regions.csv"), show_col_types = FALSE)
 
-```{r recode-species, echo = FALSE}
-# In this chunk I'm doing a bunch of analysis that I don't want to present 
-# in my slides. But I need the resulting data frame for a plot I want to present.
-penguins_modified <- penguins %>%
-  mutate(species = fct_other(species, keep = "Adelie"))
+# make appropriate date for chronological plotting and convert characters in medal wins to numeric values
+olympics %<>%
+  mutate(
+    date = ifelse(season == "Winter", paste0(year, "-02-01"), paste0(year, "-07-01")),
+    date = ymd(date),
+    medal_winner = ifelse(is.na(medal), 0, 1),
+    medal_score = case_when(
+      medal == "Bronze" ~ 1,
+      medal == "Silver" ~ 2,
+      medal == "Gold" ~ 3,
+      TRUE ~ 0
+    )
+  )
+
+noc_regions %<>%
+  janitor::clean_names() %>%
+  # fix typo
+  mutate(region = ifelse(region == "Boliva", "Bolivia", region))
+
+olympics <- left_join(olympics, noc_regions, by = "noc")
+
+olympics_filter <- olympics %>%
+  filter(season == "Summer") %>%
+  group_by(region) %>%
+  dplyr::summarise(total_winners = sum(medal_winner), total_score = sum(medal_score)) %>%
+  filter(total_winners >= 910)
 ```
 
-```{r plot-penguins, echo = FALSE, warning = FALSE, fig.alt = "Body mass vs. flipper lenght of Palmer Penguins for species Adelie and all the others combined together. There is a relatively strong, positive relationship between the two variables. The Adelie penguins are clustered together but they don't exhibit a different trend than the rest of the penguins."}
-# Code hidden with echo = FALSE
-# Uses modified penguins dataset from previous chunk
-# Play around with height and width until you're happy with the look
-ggplot(penguins_modified, aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
-  geom_point() + 
-  theme_minimal()
+```{r cumulative-medal-count-plot, echo = FALSE, out.width = "90%"}
+ggplot(olympics_filter, aes(x = reorder(region, total_winners), y = total_winners)) +
+  geom_bar(stat = "identity", fill = "#5CC0AB") +
+  labs(x = "Country",
+       y = "Medal Count",
+       title = "All-time Summer Olympic Medal Counts",
+       subtitle = "For the top 10 most winningest countries in history",
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  theme_minimal() +
+  theme(strip.background = element_blank(),
+        strip.text.y = element_blank(),
+        panel.spacing.y = unit(0.4, "cm"),
+        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+        axis.text.x = element_text(family = "Oswald", color = "#092260"),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+        axis.text.y = element_text(family = "Oswald", color = "#092260"),
+        axis.title.y = element_markdown(family = "Oswald", color = "#092260", size = 14),
+        legend.position = "none")
+```
+---
+class: middle, center
+
+```{r usa-victories-plot, echo = FALSE, out.width = "90%"}
+usa_fil <- olympics %>%
+  filter(noc == "USA") %>%
+  group_by(sport, year)%>%
+  dplyr::summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop")%>%
+  filter(sport %in% c("Swimming", "Athletics"))
+
+ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    x = "Year",
+    y = "Medal Count",
+    title = "USA Olympic Medals Won in Athletics and Swimming",
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
+  theme_minimal() +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  scale_x_continuous(limits = c(1896, 2016), breaks = seq(1896, 2016, by = 8)) +
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260"),
+    axis.title.y = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.title = element_blank(),
+    legend.position = c(0.8, 0.18),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm")
+  )
+```
+---
+class: middle, center
+
+```{r wrangle-gdp, echo = FALSE, warning = FALSE}
+detach(package:plyr, unload = TRUE)
+gdp <- read_csv("../data/gdp-per-capita-maddison-2020.csv", show_col_types = FALSE)
+
+gdp %<>%
+  janitor::clean_names() %>%
+  mutate(entity = case_when(
+    entity == "United States" ~ "USA",
+    entity == "United Kingdom" ~ "UK",
+    entity == "Congo" ~ "Republic of Congo",
+    entity == "Democratic Republic of Congo" ~ "Democratic Republic of the Congo",
+    entity == "Cote d'Ivoire" ~ "Ivory Coast",
+    entity == "Trinidad and Tobago" ~ "Trinidad",
+    entity == "North Macedonia" ~ "Macedonia",
+    entity == "Czechia" ~ "Czech Republic",
+    TRUE ~ entity
+  ))
+
+olympics_gdp <- olympics %>%
+  group_by(region, date, season) %>%
+  dplyr::summarise(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop") %>%
+  rename(entity = region) %>%
+  mutate(
+    year = year(date),
+    summer_highlight = ifelse(total_winners > 100, T, F),
+    winter_highlight = ifelse(total_winners > 30, T, F)
+  ) %>%
+  left_join(gdp, by = c("entity", "year")) %>%
+  rename(country = entity)
 ```
 
----
+```{r faceted-gdp-plots-1, fig.asp = 1.2, echo = FALSE, out.width = "50%", warning = FALSE}
+winter_highlight <- olympics_gdp %>%
+  filter(!is.na(gdp_per_capita), season == "Winter", year %in% c(2000:2020), total_winners > 30)
 
-## References
+olympics_gdp %>%
+  filter(!is.na(gdp_per_capita), season == "Winter", year %in% c(2000:2020)) %>%
+  ggplot(aes(x = gdp_per_capita, y = total_winners)) +
+  geom_point(aes(color = winter_highlight, size = winter_highlight), alpha = .5, size = .75, show.legend = FALSE) +
+  geom_text_repel(
+    data = winter_highlight, aes(x = gdp_per_capita, y = total_winners, label = country),
+    color = "#7B38EC", size = 3.5, family = "Oswald"
+  ) +
+  facet_wrap(~year, ncol = 1) +
+  scale_color_manual(values = c("#5CC0AB", "#7B38EC")) +
+  labs(
+    title = "Total Medals Won vs. GDP per capita",
+    subtitle = "Winter Olympics, 2002-2014",
+    y = "Total Medals Won",
+    x = "GDP per capita (USD)",
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
+  scale_y_continuous(breaks = seq(from = 0, to = 100, by = 50)) +
+  scale_x_continuous(
+    breaks = seq(from = 0, to = 90000, by = 30000),
+    labels = label_dollar(scale = .001, prefix = "$", suffix = "K")
+  ) +
+  theme_minimal() +
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    legend.title = element_blank(),
+    legend.position = c(0.8, 0.68),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    strip.text = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260", size = 8),
+    axis.title.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14)
+  )
 
-.pull-left[
-- Some text
-- goes here
-]
-.pull-right[
-```{r warning=FALSE, out.width="100%", fig.width=4, echo=FALSE}
-# see how I changed out.width and fig.width from defaults
-# to make the figure bigger
-ggplot(penguins, aes(x = bill_length_mm, y = species, color = species)) +
-  geom_boxplot() +
-  theme_minimal()
+summer_highlight <- olympics_gdp %>%
+  filter(!is.na(gdp_per_capita), season == "Summer", year %in% c(2004:2020), total_winners > 100)
 ```
-]
-
 ---
-
-class: inverse, middle, center
-
-# A new section...
-
+class: middle, center
+```{r faceted-gdp-plots-2, fig.asp = 1.2, echo = FALSE, out.width = "50%", warning = FALSE}
+olympics_gdp %>%
+  filter(!is.na(gdp_per_capita), season == "Summer", year %in% c(2004:2020)) %>%
+  ggplot(aes(x = gdp_per_capita, y = total_winners)) +
+  geom_point(aes(color = summer_highlight, size = summer_highlight),
+    alpha = .5, size = .75, show.legend = FALSE
+  ) +
+  geom_text_repel(
+    data = summer_highlight, aes(x = gdp_per_capita, y = total_winners, label = country),
+    color = "#7B38EC", size = 3.5, family = "Oswald"
+  ) +
+  facet_wrap(~year, ncol = 1) +
+  scale_color_manual(values = c("#5CC0AB", "#7B38EC")) +
+  labs(
+    title = "Total Medals Won vs. GDP per capita",
+    subtitle = "Summer Olympics, 2004-2016",
+    y = "Total Medals Won",
+    x = "GDP per capita (USD)",
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
+  scale_y_continuous(breaks = seq(from = 0, to = 300, by = 100)) +
+  scale_x_continuous(
+    breaks = seq(from = 0, to = 90000, by = 30000),
+    labels = label_dollar(scale = .001, prefix = "$", suffix = "K")
+  ) +
+  theme_minimal() +
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    legend.title = element_blank(),
+    legend.position = c(0.8, 0.68),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    strip.text = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260", size = 8),
+    axis.title.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14)
+  )
+```
 ---
-
-## Tables
-
-If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
-
-```{r penguins-table, echo = FALSE}
-kable(head(penguins), format = "html")
+class: middle, center
+```{r faceted-gdp-plots-3, fig.asp = 1.2, echo = FALSE, out.width = "50%", warning = FALSE}
+olympics_gdp %>%
+  filter(!is.na(gdp_per_capita), country != "Qatar", season == "Summer", year %in% c(2004:2020)) %>%
+  ggplot(aes(x = gdp_per_capita, y = total_winners)) +
+  geom_point(aes(color = summer_highlight, size = summer_highlight),
+    alpha = .5, size = .75, show.legend = FALSE
+  ) +
+  geom_text_repel(
+    data = summer_highlight, aes(x = gdp_per_capita, y = total_winners, label = country),
+    color = "#7B38EC", size = 3.5, family = "Oswald"
+  ) +
+  facet_wrap(~year, ncol = 1) +
+  scale_color_manual(values = c("#5CC0AB", "#7B38EC")) +
+  labs(title = "Total Medals Won vs. GDP per capita",
+       subtitle = "Summer Olympics, 2004-2016",
+       y = "Total Medals Won",
+       x = "GDP per capita (USD)",
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  scale_y_continuous(breaks = seq(from = 0, to = 300, by = 100)) +
+  scale_x_continuous(
+    breaks = seq(from = 0, to = 90000, by = 30000),
+    labels = label_dollar(scale = .001, prefix = "$", suffix = "K")
+  ) +
+  theme_minimal() +
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    legend.title = element_blank(),
+    legend.position = c(0.8, 0.68),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    strip.text = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260", size = 8),
+    axis.title.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14)
+  )
 ```
 
----
 
-## Images
-
-```{r castle, echo = FALSE, out.width = "40%", fig.align = "center", fig.cap = "Image credit: Danielle Navarro, Percolate."}
-include_graphics("img/watercolour_sys02_img32_percolate.jpg")
-```
-
-Or you can also include a full page image. See next slide.
-
----
-
-background-image: url(img/watercolour_sys02_img32_percolate.jpg)
-
----
-
-## Math Expressions
-
-You can write LaTeX math expressions inside a pair of dollar signs, e.g. &#36;\alpha+\beta$ renders $\alpha+\beta$. You can use the display style with double dollar signs:
-
-```
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-```
-
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-
-Limitations:
-
-1. The source code of a LaTeX math expression must be in one line, unless it is inside a pair of double dollar signs, in which case the starting `$$` must appear in the very beginning of a line, followed immediately by a non-space character, and the ending `$$` must be at the end of a line, led by a non-space character;
-
-1. There should not be spaces after the opening `$` or before the closing `$`.
-
-1. Math does not work on the title slide (see [#61](https://github.com/yihui/xaringan/issues/61) for a workaround).
-
----
-
-class: inverse, middle, center
-
-# Wrap up
-
----
-
-## Feeling adventurous?
-
-- Want to find out more about `xaringan`? See https://slides.yihui.name/xaringan/#1.
-
-- You are welcomed to use the default styling of the slides. In fact, that's what I expect majority of you will do. You will differentiate yourself with the content of your presentation.
-
-- But some of you might want to play around with slide styling. The 
-`xaringanthemer` provides some solutions for this that: https://pkg.garrickadenbuie.com/xaringanthemer.
-
-- And if you want more bells and whistles, there is also `xaringanExtra`: https://pkg.garrickadenbuie.com/xaringanExtra.
