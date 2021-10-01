@@ -609,7 +609,3 @@ olympics_gdp %>%
 ```
 
 
-
-## References
-
-
