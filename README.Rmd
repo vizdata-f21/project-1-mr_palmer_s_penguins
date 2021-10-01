@@ -730,6 +730,8 @@ Bolt, J, van Zanden J. L. 2020, *GDP per capita, 1820-2018*, electronic dataset,
 
 Claus O. Wilke 2020, *ggtext: Improved Text Rendering Support for 'ggplot2’.*, R package version 0.1.1. <https://CRAN.R-project.org/package=ggtext>
 
+Kirill Müller and Lorenz Walthert (2021). *styler: Non-Invasive Pretty Printing of R Code.* https://github.com/r-lib/styler, https://styler.r-lib.org.
+
 Garrett Grolemund, Hadley Wickham 2011, *Dates and Times Made Easy with lubridate.*, Journal of Statistical Software, 40(3), 1-25. <https://www.jstatsoft.org/v40/i03/>
 
 Hadley Wickham 2011, *The Split-Apply-Combine Strategy for Data Analysis.*, Journal of Statistical Software, 40(1), 1-29. <http://www.jstatsoft.org/v40/i01/>
@@ -750,14 +752,16 @@ Wickham et al., 2019, *Welcome to the tidyverse.*, Journal of Open Source Softwa
 
 Yixuan Qiu et al., 2021, *showtext: Using Fonts More Easily in R Graphs.*, R package version 0.9-4. <https://CRAN.R-project.org/package=showtext>
 
-[BMI](http=s://en.wikipedia.org/wiki/Body_mass_index)
+#### Coding & Outside Research
 
-We found a citation for the Tokyo 2020 Olympics logo font [here](https://www.reddit.com/r/identifythisfont/comments/4ig8ua/font_used_on_the_tokyo_2020_logo/) and were pointed to an open-source alternative [here](https://graphicdesign.stackexchange.com/questions/7178/is-there-a-din-font-free-alternative). 
+Wikipedia Contributors, 2019, *Body mass index*. [online] Wikipedia. Available at: https://en.wikipedia.org/wiki/Body_mass_index
 
-We got the hex code used in plot text manually from that logo source. We chose the hex codes for our favorite gender color mapping from Telegraph 2018 [here](https://blog.datawrapper.de/gendercolor/).
+CruzeiroDoSul, 2016, *Font used on the Tokyo 2020 logo* [online] Available at: https://www.reddit.com/r/identifythisfont/comments/4ig8ua/font_used_on_the_tokyo_2020_logo/ [Accessed 1 Oct. 2021].
 
- according to a Britannica article found [here](https://www.britannica.com/sports/Olympic-Games)
+Graphic Design Stack Exchange, 2014, *web safe - Is there a DIN font free alternative? * [online] Available at: https://graphicdesign.stackexchange.com/questions/7178/is-there-a-din-font-free-alternative [Accessed 1 Oct. 2021].
+
+GmbH, D, 2018, *An alternative to pink & blue: Colors for gender data* [online] Chartable. Available at: https://blog.datawrapper.de/gendercolor/
+
+Young, D.C. and Abrahams, H.M., 2019, *Olympic Games | History, Locations, & Winners* In: Encyclopædia Britannica. [online] Available at: https://www.britannica.com/sports/Olympic-Games
  
- puberty is at a later age as described [here](https://www.nhs.uk/live-well/sexual-health/stages-of-puberty-what-happens-to-boys-and-girls/)
- 
-Kirill Müller and Lorenz Walthert (2021). styler: Non-Invasive Pretty Printing of R Code. https://github.com/r-lib/styler, https://styler.r-lib.org.
+NHS Choices, 2018, *Sexual health* [online] NHS. Available at: https://www.nhs.uk/live-well/sexual-health/stages-of-puberty-what-happens-to-boys-and-girls/
