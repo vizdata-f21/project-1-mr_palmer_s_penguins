@@ -9,11 +9,10 @@ output: github_document
 library(lubridate)
 library(countrycode)
 library(gganimate)
-#library(plyr)
+library(plyr)
 library(gifski)
-#library(dplyr)
+library(dplyr)
 library(scales)
-library(ragg)
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(showtext)) # cool fonts
 suppressPackageStartupMessages(library(magrittr))
@@ -501,6 +500,7 @@ In our first visualization, we will plot `medals_total` on the y-axis and `date`
 #### Plot 2
 
 ```{r}
+detach(package:plyr, unload = TRUE)
 gdp <- read_csv("data/gdp-per-capita-maddison-2020.csv")
 
 gdp %<>%
