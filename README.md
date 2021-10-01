@@ -3,37 +3,6 @@ Characteristics
 ================
 by Mr. Palmer’s Penguins
 
-Loading the packages we need for the project.
-
-``` r
-# load packages here
-suppressPackageStartupMessages(library(lubridate))
-suppressPackageStartupMessages(library(gganimate))
-suppressPackageStartupMessages(library(ggrepel))
-suppressPackageStartupMessages(library(plyr))
-suppressPackageStartupMessages(library(gifski))
-suppressPackageStartupMessages(library(dplyr))
-suppressPackageStartupMessages(library(scales))
-suppressPackageStartupMessages(library(tidyverse))
-suppressPackageStartupMessages(library(showtext)) # cool fonts
-suppressPackageStartupMessages(library(magrittr))
-suppressPackageStartupMessages(library(ggtext)) # superscript in plot labels
-suppressPackageStartupMessages(library(styler))
-```
-
-Loading the data CSV from the `data` folder:
-
-``` r
-# load data here
-olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"), show_col_types = FALSE)
-```
-
-Setting the universal chunk options:
-
-``` r
-knitr::opts_chunk$set(fig.width = 8, fig.asp = 0.618, out.width = "80%")
-```
-
 ## Introduction
 
 The set, which includes 15 variables and 271116 observations, provides
@@ -224,7 +193,7 @@ ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = 
 <img src="README_files/figure-gfm/plot-weightclass-1.png" width="80%" />
 
 ``` r
-ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex)) +
+ggplot(olympics_coordination, mapping = aes(y = fct_rev(sport), x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
   labs(
     x = "Body Mass Index (kg/m<sup>2</sup>)",
@@ -259,7 +228,7 @@ ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex
 <img src="README_files/figure-gfm/plot-coordination-1.png" width="80%" />
 
 ``` r
-ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
+ggplot(olympics_diverse, mapping = aes(y = fct_rev(sport), x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
   labs(
     x = "Body Mass Index (kg/m<sup>2</sup>)",
@@ -294,7 +263,7 @@ ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
 <img src="README_files/figure-gfm/plot-diverse-1.png" width="80%" />
 
 ``` r
-ggplot(olympics_acrobatic, mapping = aes(y = sport, x = BMI, color = sex)) +
+ggplot(olympics_acrobatic, mapping = aes(y = fct_rev(sport), x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
   labs(
     x = "Body Mass Index (kg/m<sup>2</sup>)",
@@ -501,7 +470,8 @@ extreme variability between mean ages of females prior to 1950 is the
 result of fewer females competing. With fewer competitors, it’s more
 likely that outlier events (extremely old participants) can skew the
 mean. For example, prior to 1920, there were 210 female participants
-versus 9,790 male participants as depicted below.
+versus 9,790 male participants as depicted below. This is a major
+limitation for this plot.
 
 ``` r
 olympics %>%
@@ -526,7 +496,7 @@ The Olympics are a historic sports event that have been run for over a
 125 years. To really grasp the full story of success at the Olympics, we
 want to take a broader view and look at which countries have been most
 successful throughout all the Olympic games and in which sports. Nations
-take pride in their overall medal counts– in modern times, Google tracks
+take pride in their overall medal counts–in modern times, Google tracks
 and publishes these medal counts. Despite popular interest in these
 metrics, fewer people are aware of their nations’ performance extending
 back over a century. Thus, we are intrigued by these cumulative wins and
@@ -557,8 +527,8 @@ relationship between a country’s wins and its economic indicators.
 
 Thus, the question we will examine is the following: which countries are
 most successful at the games and is this success potentially influenced
-by performance in particular sports or by the economic status of a
-country (as measured by GDP)?
+by high performance in particular sports and/or by the economic status
+of a country (as measured by GDP)?
 
 ### Approach
 
@@ -628,15 +598,15 @@ olympics_filter <- olympics %>%
 
 The data wrangling step above involves adding the month and day to the
 dates of our summer and winter olympic data to help us plot it as time
-series data, should we need to do this. We then clean the noc\_regions
+series data, should we need to do this. We then clean the `noc_regions`
 data.
 
 We have now filtered the data to be used in our first visualization for
 only Summer Olympic success, as different countries may be successful in
-different seasons. For this visualization, we are interested in the
-summer Olympics.
-
-### Plot 1
+different seasons. Given the limitations of the scope of analysis for
+this project, we will only look at the summer Olympics for this
+visualization as we feel it is more meaningful than combining both the
+summer and winter medal counts.
 
 ``` r
 ggplot(olympics_filter, aes(x = reorder(region, total_winners), y = total_winners)) +
@@ -661,7 +631,6 @@ ggplot(olympics_filter, aes(x = reorder(region, total_winners), y = total_winner
 ```
 
 <img src="README_files/figure-gfm/cumulative-medal-count-plot-1.png" width="80%" />
-
 Here is our first plot, which represents the 10 countries that have won
 the most medals in Summer Olympic history.
 
@@ -675,7 +644,7 @@ filtering for only swimming and athletics.
 usa_fil <- olympics %>%
   filter(noc == "USA") %>%
   group_by(sport, year)%>%
-  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop")%>%
+  dplyr::summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop")%>%
   filter(sport %in% c("Swimming", "Athletics"))
 
 ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport)) +
@@ -715,7 +684,8 @@ ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport)) 
 Here we have plotted the number of medals won in Athletics and Swimming
 at each Summer Olympic games over the years.
 
-#### Plot 2
+Next, we will look at the economic characteristics of these winning
+countries.
 
 ``` r
 # warnings suppressed due to parsing failures of gdp data which do not affect the data of our concern
@@ -1013,28 +983,41 @@ more development of Team USA swimming and coaching and more young
 athletes interested and with entryway into the sport, or the addition of
 more swimming events. In the last three Olympics for which we have data,
 we can see that the gap between the two sports stays relatively steady
-but success in both is on the rise.
+but success in both is on the rise. Perhaps this tells us that countries
+that are successful in sports with more medals up for grabs tend to see
+higher total medals for their country. Of course, more visualizations
+could be done to understand the sports that other countries like Russia
+do well in or how this varies by season. However, since we are working
+withing constraints for the length of the project, this will have to
+remain as a limitation.
 
-Our visualizations of economic indicators against Olympic success reveal
-both an association we expected and some meaningful outliers we did not
-predict. In the recent winter Olympics (since 2002), all of the
-countries with over 30 medal wins per games had a GDP per capita of over
-30,000 USD, with the exception of Russia. It seems that perhaps Russia’s
-strong cultural history in winter sports like figure skating, their
-legacy of coaches and athletes that transformed the sport, speaks
-stronger than nationwide production and wealth. When we take the long
-view, Russia emerges as a high medal winner much earlier on, before the
-association of high GDP per capita with high medal counts for countries
-such as the US arises. This further testifies to the powerful history of
-winter sports in what is now Russia. And in the summer games, another
-country with GDP per capita under 30,000 USD shows outstanding
-performance – China. China’s significantly stronger showing in the
-summer Olympics than the winter games has left a mark in the 2000s.
-During this period, China’s performance as a nation peaked on its home
-turf, at the 2008 Beijing games. The Olympics offer nations a
-significant opportunity to present a positive image of themselves
-internationally, and it appears that despite economic trends, China has
-taken full advantage of that chance to demonstrate their power.
+In addition to the specific sports a country excels in being potentially
+related to medal success, our visualizations of economic indicators
+against Olympic success reveal both an association we expected and some
+meaningful outliers we did not predict. In the recent winter Olympics
+(since 2002), all of the countries with over 30 medal wins per games had
+a GDP per capita of over 30,000 USD, with the exception of Russia. It
+seems that perhaps Russia’s strong cultural history in winter sports
+like figure skating, their legacy of coaches and athletes that
+transformed the sport, speaks stronger than nationwide production and
+wealth. When we take the long view, Russia emerges as a high medal
+winner much earlier on, before the association of high GDP per capita
+with high medal counts for countries such as the US arises. This further
+testifies to the powerful history of winter sports in what is now
+Russia. And in the summer games, another country with GDP per capita
+under 30,000 USD shows outstanding performance – China. China’s
+significantly stronger showing in the summer Olympics than the winter
+games has left a mark in the 2000s. During this period, China’s
+performance as a nation peaked on its home turf, at the 2008 Beijing
+games. The Olympics offer nations a significant opportunity to present a
+positive image of themselves internationally, and it appears that
+despite economic trends, China has taken full advantage of that chance
+to demonstrate their power.
+
+It is important to note that there are limitations with GDP per capita
+in terms of understanding the potential resources and opportunities
+available in a country as it does not fully take into account how wealth
+is spread.
 
 ## Presentation
 
@@ -1109,12 +1092,7 @@ Yixuan Qiu et al. 2021, *showtext: Using Fonts More Easily in R
 Graphs.*, R package version 0.9-4.
 <https://CRAN.R-project.org/package=showtext>
 
-#### Other References
-
 #### Coding & Outside Research
-
-Wikipedia Contributors, 2019, *Body mass index*. \[online\] Wikipedia.
-Available at: <https://en.wikipedia.org/wiki/Body_mass_index>
 
 CruzeiroDoSul, 2016, *Font used on the Tokyo 2020 logo* \[online\]
 Available at:
@@ -1134,9 +1112,16 @@ Young, D.C. and Abrahams, H.M., 2019, *Olympic Games | History,
 Locations, & Winners* In: Encyclopædia Britannica. \[online\] Available
 at: <https://www.britannica.com/sports/Olympic-Games>
 
+Wikipedia Contributors, *Olympic\_rings\_without\_rims*. \[online\]
+Available at:
+<https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Olympic_rings_without_rims.svg/1200px-Olympic_rings_without_rims.svg.png>
+
 ChinaPower Project 2018, *How dominant is China at the Olympic Games?*
 \[online\]. Available at:
 <https://chinapower.csis.org/dominant-china-olympic-games/>
 
 NHS Choices, 2018, *Sexual health* \[online\] NHS. Available at:
 <https://www.nhs.uk/live-well/sexual-health/stages-of-puberty-what-happens-to-boys-and-girls/>
+
+Wikipedia Contributors, 2019, *Body mass index*. \[online\] Wikipedia.
+Available at: <https://en.wikipedia.org/wiki/Body_mass_index>
