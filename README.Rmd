@@ -6,14 +6,13 @@ output: github_document
 
 ```{r load-packages, echo = FALSE}
 # load packages here
-library(lubridate)
-library(countrycode)
-library(gganimate)
-library(ggrepel)
-library(plyr)
-library(gifski)
-library(dplyr)
-library(scales)
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(gganimate))
+suppressPackageStartupMessages(library(ggrepel))
+suppressPackageStartupMessages(library(plyr))
+suppressPackageStartupMessages(library(gifski))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(scales))
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(showtext)) # cool fonts
 suppressPackageStartupMessages(library(magrittr))
@@ -23,12 +22,10 @@ suppressPackageStartupMessages(library(ggtext)) # superscript in plot labels
 ```{r load-data, echo = FALSE}
 # load data here
 olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
-
 ```
 
 ```{r set-options, echo = FALSE}
 knitr::opts_chunk$set(fig.width = 8, fig.asp= 0.618, out.width = "80%")
-
 ```
 
 ## Introduction
@@ -358,14 +355,12 @@ For our second visualization,
 
 ### Analysis
 
-```{r}
-olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
-noc_regions <- read_csv(file = paste0(here::here(), "/data/noc_regions.csv"))
-```
-
 Above we have loaded the olympic dataset and also the full country names into the noc_regions object.
 
 ```{r wrangling-medals}
+olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
+noc_regions <- read_csv(file = paste0(here::here(), "/data/noc_regions.csv"))
+
 # make appropriate date
 olympics %<>%
   mutate(date = ifelse(season == "Winter", paste0(year, "-02-01"), paste0(year, "-07-01")),
@@ -380,13 +375,9 @@ olympics %<>%
 noc_regions %<>%
   janitor::clean_names() %>%
   mutate(region = ifelse(region == "Boliva", "Bolivia", region))
-
-flags <- tibble(noc = noc_regions$noc, region = noc_regions$region, flag = countrycode(noc_regions$region, 'country.name', 'unicode.symbol'))
-
-olympics <- left_join(olympics, flags, by = "noc")
 ```
 
-The data wrangling step above involves adding the month and day to the dates of our summer and winter olympic data to help us plot it as time series data, should we need to do this. We then clean the noc_regions data and attach emoji symbols for the country's flags onto the dataset with a left join.
+The data wrangling step above involves adding the month and day to the dates of our summer and winter olympic data to help us plot it as time series data, should we need to do this. We then clean the noc_regions data.
 
 
 ```{r}
@@ -400,7 +391,7 @@ olympics_filter <- olympics %>%
 
 We have now filtered the data to be used in our first visualization for only Summer Olympic success, as different countries may be successful in different seasons. For this visualization, we are interested in the Summer Olympics. We then summarize the total medals as the sum of the `medal_winner` column, which represents 1 or 0 for if an athlete won a medal or not, and add up the `medal_score` column to get a total score that weights gold, silver and bronze medals.
 
-###Plot 1
+### Plot 1
 
 ```{r}
 
@@ -477,8 +468,7 @@ Here we have plotted the number of medals won in Athletics and Swimming at each 
 
 #### Plot 2
 
-```{r}
-detach(package:plyr, unload = TRUE)
+```{r wrangle-gdp-plot}
 gdp <- read_csv("data/gdp-per-capita-maddison-2020.csv")
 
 gdp %<>%
@@ -494,9 +484,7 @@ gdp %<>%
     entity == "Czechia" ~ "Czech Republic",
     TRUE ~ entity
   ))
-```
 
-```{r}
 olympics_gdp <- olympics %>%
   group_by(region, date, season, flag) %>%
   summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop") %>%
