@@ -823,7 +823,7 @@ olympics_gdp %>%
   scale_color_manual(values = c("#5CC0AB", "#7B38EC")) +
   labs(
     title = "Total Medals Won vs. GDP per capita",
-    subtitle = "Winter Olympics, 2004-2016",
+    subtitle = "Summer Olympics, 2004-2016",
     y = "Total Medals Won",
     x = "GDP per capita (USD)",
     caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
@@ -856,6 +856,27 @@ olympics_gdp %>%
 ```
 
 <img src="README_files/figure-gfm/faceted-gdp-plots-2.png" width="80%" />
+
+``` r
+olympics_gdp %>%
+  distinct(country, gdp_per_capita) %>%
+  arrange(desc(gdp_per_capita)) %>%
+  head(10)
+```
+
+    ## # A tibble: 10 × 2
+    ##    country              gdp_per_capita
+    ##    <chr>                         <dbl>
+    ##  1 Qatar                       156299 
+    ##  2 Qatar                       153922 
+    ##  3 Qatar                       107402.
+    ##  4 Norway                       82814 
+    ##  5 Norway                       82216 
+    ##  6 Norway                       81759 
+    ##  7 Kuwait                       78801 
+    ##  8 Norway                       78476.
+    ##  9 Norway                       76522.
+    ## 10 United Arab Emirates         75876
 
 ``` r
 olympics_gdp %>%
@@ -904,6 +925,12 @@ olympics_gdp %>%
 
 <img src="README_files/figure-gfm/faceted-gdp-plots-3.png" width="80%" />
 
+Then we plot GDP per capita against medals won over time in the summer
+and winter Olympics separately. Qatar, which has a GDP per capita of
+nearly double the next highest nation, makes it difficult to view trends
+among remaining countries, so we remove them for a second look at the
+summer games.
+
 ``` r
 winter_highlight <- olympics_gdp %>%
   filter(!is.na(gdp_per_capita), season == "Winter", year %in% c(1950:2020), total_winners > 30)
@@ -914,7 +941,7 @@ winter_gdp <- olympics_gdp %>%
   geom_point(aes(color = winter_highlight), alpha = .5, size = 2, show.legend = FALSE) +
   geom_text(
     data = winter_highlight, aes(x = gdp_per_capita, y = total_winners, label = country),
-    color = "#7B38EC", size = 4, family = "Oswald", vjust = .2
+    color = "#7B38EC", size = 4, family = "Oswald", vjust = 1
   ) +
   scale_color_manual(values = c("#5CC0AB", "#7B38EC")) +
   labs(
@@ -952,47 +979,65 @@ animate(winter_gdp, duration = 16, fps = 10, renderer = gifski_renderer())
 
 <img src="README_files/figure-gfm/winter-animation-1.gif" width="80%" />
 
+To look at these economic trends over a longer period of time, we
+animate our winter GDP plot from the 1950s onward.
+
 ### Discussion
 
-After plotting the 10 most successful Summer Olympic countries in
+After plotting the 10 most successful summer Olympic countries in
 history, it is clear that the USA has a wide lead over the USSR, which
 is in second place, and other countries behind them, including Great
 Britain, Germany, France, and Italy. The United States, as seen in the
-visualization, has won over 5,000 Summer Olympic medals, while the USSR
-has won just over 2,000, Britain a similar amount, and we can see a
-steady decline after that. We can assume that the USSR’s grasp on second
-place total medals will soon be overtaken as they have split into many
-smaller countries and Russia, and can no longer win medals under the
-USSR title. Because of this and the wide gap between first and second
-place, we decided to examine the data to see which sports contributed
-most to the success of the Americans. After examining the data and
-grouping the USA’s medals by sport, it was clear that the two most
-successful American Summer Olympic sports were swimming and athletics.
+visualization, has won over 5,000 summer Olympic medals, while the USSR
+has won just over 2,000. Britain has earned a similar amount, and we can
+see a steady decline after that. Because of the wide gap between first
+and second place, we decided to examine the data to see which sports
+contributed most to the success of the Americans. After examining the
+data and grouping the USA’s medals by sport, we found that the two most
+successful American summer Olympic sports were swimming and athletics.
 
-The immense contribution of swimming and athletics to American Summer
-Olympic success makes sense as these two sports consist of many events
-with lots of medals up for grabs, as compared to a sport like basketball
-in which only one medal can be one at each Summer Olympics. We wanted to
-now examine the success of the USA in these two sports, swimming and
-athletics, and see if it has changed over time. After grouping USA’s
-Summer Olympic data by sport and year, we filter for swimming and
-athletic data to see how the Americans have fared in these two sports
-over time, compared to each other. The plot shows that from the first
-Olympic games until the 1960 games, the USA won more athletic medals
-than swimming medals at every occurrence of the Summer Olympics. But,
-starting in 1960, The number of medals won by the USA in swimming
-overtook the same number for athletics, and since then, the United
-States has won more swimming than athletic medals at every Olympic
-games. The data is missing values for 1940 and 1944 because of World War
-II, and for 1980 because of the worldwide boycott of the Russian Olympic
-games. The trend seen is very interesting, as we can see that in the
-late 20th century, there was a small gap between the number of medals
-won in swimming and athletics, but starting in 1996 and continuing
-through the turn of the century, the gap started to widen. This could be
-because of a multitude of reasons, including more USA swimming
-development or the addition of more swimming events. In the last three
-Olympics for which we have data, we can see that the gap between the two
-sports stays relatively steady but success in both is on the rise.
+The immense contribution of swimming and athletics to American summer
+Olympic success feels intuitive, as these two sports consist of a myriad
+of events with many medals up for grabs, whereas sports like basketball
+offer only a few medal opportunities at each summer Olympics. When we
+examine how the USA accumulated successes in these sports over time, we
+find that until the 1960 games, the USA won more athletic medals than
+swimming medals at every occurrence of the summer Olympics. But,
+starting in 1960, the USA medal count in swimming overtook athletics,
+and since then, the United States has won more swimming than athletic
+medals at every Olympic games. The data is missing values for 1940 and
+1944 because of World War II and for 1980 because of the worldwide
+boycott of the Russian Olympic games. We found this observed trend
+interesting because in the late 20th century, there was a small gap
+between the number of medals won in swimming and athletics, but starting
+in 1996 and continuing through the turn of the century, the gap started
+to widen. This could be because of a multitude of reasons, including
+more development of Team USA swimming and coaching and more young
+athletes interested and with entryway into the sport, or the addition of
+more swimming events. In the last three Olympics for which we have data,
+we can see that the gap between the two sports stays relatively steady
+but success in both is on the rise.
+
+Our visualizations of economic indicators against Olympic success reveal
+both an association we expected and some meaningful outliers we did not
+predict. In the recent winter Olympics (since 2002), all of the
+countries with over 30 medal wins per games had a GDP per capita of over
+30,000 USD, with the exception of Russia. It seems that perhaps Russia’s
+strong cultural history in winter sports like figure skating, their
+legacy of coaches and athletes that transformed the sport, speaks
+stronger than nationwide production and wealth. When we take the long
+view, Russia emerges as a high medal winner much earlier on, before the
+association of high GDP per capita with high medal counts for countries
+such as the US arises. This further testifies to the powerful history of
+winter sports in what is now Russia. And in the summer games, another
+country with GDP per capita under 30,000 USD shows outstanding
+performance – China. China’s significantly stronger showing in the
+summer Olympics than the winter games has left a mark in the 2000s.
+During this period, China’s performance as a nation peaked on its home
+turf, at the 2008 Beijing games. The Olympics offer nations a
+significant opportunity to present a positive image of themselves
+internationally, and it appears that despite economic trends, China has
+taken full advantage of that chance to demonstrate their power.
 
 ## Presentation
 
@@ -1056,12 +1101,14 @@ Stefan Milton Bache and Hadley Wickham 2020, *magrittr: A Forward-Pipe
 Operator for R.*, <https://magrittr.tidyverse.org>,
 <https://github.com/tidyverse/magrittr>
 
-Wickham et al., 2019, *Welcome to the tidyverse.*, Journal of Open
-Source Software, 4(43), 1686, <https://doi.org/10.21105/joss.01686>
+Wickham et al. 2019, *Welcome to the tidyverse.*, Journal of Open Source
+Software, 4(43), 1686, <https://doi.org/10.21105/joss.01686>
 
-Yixuan Qiu et al., 2021, *showtext: Using Fonts More Easily in R
+Yixuan Qiu et al. 2021, *showtext: Using Fonts More Easily in R
 Graphs.*, R package version 0.9-4.
 <https://CRAN.R-project.org/package=showtext>
+
+#### Other References
 
 [BMI](http=s://en.wikipedia.org/wiki/Body_mass_index)
 
@@ -1080,6 +1127,12 @@ according to a Britannica article found
 puberty is at a later age as described
 [here](https://www.nhs.uk/live-well/sexual-health/stages-of-puberty-what-happens-to-boys-and-girls/)
 
-Kirill Müller and Lorenz Walthert (2021). styler: Non-Invasive Pretty
-Printing of R Code. <https://github.com/r-lib/styler>,
-<https://styler.r-lib.org>.
+Kirill Müller and Lorenz Walthert 2021, *styler: Non-Invasive Pretty
+Printing of R Code.* <https://github.com/r-lib/styler>,
+<https://styler.r-lib.org>
+
+We learned more context for China’s historical participation in the
+Olympics games here:
+
+ChinaPower Project 2018, *How dominant is China at the Olympic Games?*
+<https://chinapower.csis.org/dominant-china-olympic-games/>
