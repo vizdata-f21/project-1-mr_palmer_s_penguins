@@ -9,9 +9,11 @@ output: github_document
 library(lubridate)
 library(countrycode)
 library(gganimate)
+#library(plyr)
 library(gifski)
-library(plyr)
-library(dplyr)
+#library(dplyr)
+library(scales)
+library(ragg)
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(showtext)) # cool fonts
 suppressPackageStartupMessages(library(magrittr))
@@ -526,24 +528,66 @@ olympics_gdp <- olympics %>%
 ```
 
 ```{r dev = "ragg_png"}
+highlight <- olympics_gdp %>%
+  filter(!is.na(gdp_per_capita), season == "Winter", year %in% c(2000:2020), total_winners > 30)
+
 olympics_gdp %>%
-  filter(!is.na(gdp_per_capita), season == "Winter") %>%
+  filter(!is.na(gdp_per_capita), season == "Winter", year %in% c(2000:2020)) %>%
   ggplot(aes(x = gdp_per_capita, y = total_winners)) +
-  geom_point(alpha = .3) +
-  geom_text(aes(label = flag))
+  geom_point(alpha = .5, size = .5) +
+  geom_text(data = highlight, aes(x = gdp_per_capita, y = total_winners, label = flag)) +
+  facet_grid(~year, ) +
+  labs(title = "",
+       y = "Total Medal Winners",
+       x = "GDP per capita (USD)",
+       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  #scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
+  scale_x_continuous(
+    breaks = seq(from = 0, to = 90000, by = 30000),
+    labels = label_dollar(scale = .001, prefix = "$", suffix = "K")) +
+  theme_minimal() +
+  theme(strip.background = element_blank(),
+        strip.text.y = element_blank(),
+        panel.spacing.y = unit(0.4, "cm"),
+        legend.title = element_blank(),
+        legend.position = c(0.8, 0.68),
+        legend.background = element_rect(size = 0.3),
+        legend.margin = margin(1, 5, 5, 5),
+        legend.key.size = unit(0.5, "cm"),
+        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+        axis.text.x = element_text(family = "Oswald", color = "#092260"),
+        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+        axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
+        axis.title.y = element_text(family = "Oswald", color = "#092260", size = 14),
+        legend.text = element_text(family = "Oswald", color = "#092260", size = 14))
+
+highlight <- olympics_gdp %>%
+  filter(!is.na(gdp_per_capita), season == "Summer", year %in% c(2002:2020), total_winners > 100)
+
+olympics_gdp %>%
+  filter(!is.na(gdp_per_capita), season == "Summer", year %in% c(2002:2020)) %>%
+  ggplot(aes(x = gdp_per_capita, y = total_winners)) +
+  geom_point() +
+  geom_text(data = highlight, aes(x = gdp_per_capita, y = total_winners, label = entity)) +
+  facet_wrap(~year)
 ```
+
+animate(p, duration = 20, fps = 10, renderer = gifski_renderer())
 
 
 ```{r}
 p <- olympics_gdp %>%
-  filter(!is.na(gdp_per_capita), season == "Winter") %>%
+  filter(!is.na(gdp_per_capita), season == "Winter", year > 1990) %>%
   ggplot(aes(x = gdp_per_capita, y = total_score)) +
-  geom_point(alpha = .3) +
-  transition_time(year)
+  geom_text(aes(label = entity)) +
+  transition_time(year) +
+  labs(title = "Date: {frame_time}")
   # ease_aes('linear')
  # view_follow(fixed_y = TRUE)
 
-animate(p, renderer = gifski_renderer())
+animate(p, duration = 20, fps = 10, renderer = gifski_renderer())
 ```
 
 ### Discussion
