@@ -330,7 +330,7 @@ olympics %>%
 
 ---
 class: inverse, middle, center
-# Which countries are most successful at the games and is this success potentially influenced by performance in particular sports or by the economic status of a country (as measured by GDP)?
+# Which countries are most successful at the games and is this success potentially influenced by performance in particular sports and/or by the economic status of a country (as measured by GDP)?
 ---
 class: middle, center
 
