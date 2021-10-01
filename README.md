@@ -1,17 +1,38 @@
-Project title
+Beyond the Rings: Analyzing Olympic Athlete and Medal-Winning Country
+Characteristics
 ================
 by Mr. Palmer’s Penguins
 
-    ## Rows: 271116 Columns: 15
+Loading the packages we need for the project.
 
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr (10): name, sex, team, noc, games, season, city, sport, event, medal
-    ## dbl  (5): id, age, height, weight, year
+``` r
+# load packages here
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(gganimate))
+suppressPackageStartupMessages(library(ggrepel))
+suppressPackageStartupMessages(library(plyr))
+suppressPackageStartupMessages(library(gifski))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(scales))
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(showtext)) # cool fonts
+suppressPackageStartupMessages(library(magrittr))
+suppressPackageStartupMessages(library(ggtext)) # superscript in plot labels
+suppressPackageStartupMessages(library(styler))
+```
 
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Loading the data CSV from the `data` folder:
+
+``` r
+# load data here
+olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"), show_col_types = FALSE)
+```
+
+Setting the universal chunk options:
+
+``` r
+knitr::opts_chunk$set(fig.width = 8, fig.asp = 0.618, out.width = "80%")
+```
 
 ## Introduction
 
@@ -24,12 +45,9 @@ different observations reflecting each event an individual participated
 in. Each observation details medal results (Gold, Silver, Bronze, or
 NA), the athlete’s background (age, sex, height, weight, team they’re
 competing for, etc.), and context about the event (where and when it was
-held, season, sport the athlete competes in, etc.).
-
-We chose this dataset because we think it can provide a lot of good
-insights into some of the trends at the Olympics over the past century
-as well as provide strong opportunities for our group to develop our
-visualization capabilities.
+held, season, sport the athlete competes in, etc.). We chose this
+dataset because we think it can provide a lot of good insights into some
+of the trends at the Olympics over the past century.
 
 This dataset was accessed on
 [kaggle.com](https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results)
@@ -39,94 +57,86 @@ Boston Consulting Group. Moreover, it was selected as part of the
 [TidyTuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021#readme7c70d95441aec295a1e92da9d71e2872877d663c)
 challenge on 7/27/21.
 
-## Do certain physical characteristics (such as body mass index, age, and sex) of Olympic participants differ by sport and/or change with time?
+## Understanding Physical Characteristics of Olympians
 
 ### Introduction
 
-(1-2 paragraphs) Introduction to the question and what parts of the
-dataset are necessary to answer the question. Also discuss why you’re
-interested in this question.
+For this section, we hope to answer the question: do certain physical
+characteristics (such as body mass index with `height` and `weight`,
+`age`, and `sex`) of Olympic participants differ by `sport` and/or
+change with time (`year`)?
 
-As we know, the Olympic Games is a unique opportunity for diverse and
-talented individuals to showcase their skills across a variety of
-disciplines. As a result, we are interested in better understanding how
-the diversity of physical characteristics in the set of competing
-athletes potentially differs by sport and/or has changed with time.
-Three physcial characteristics of interest are body mass index (a ratio
-of `height` and `weight`), `sex`, and `age`. It’s often the case that
-the media/press discuss these these physical characteristics as key
+The Olympic Games are a unique opportunity for diverse and talented
+individuals to showcase their skills across a variety of disciplines. As
+a result, we are interested in better understanding how the diversity of
+physical characteristics in the set of competing athletes potentially
+differs by sport and/or has changed with time. Three physical
+characteristics of interest are body mass index (a factor that takes
+`height` and `weight` into account), `sex`, and `age`. It’s often the
+case that the media/press discuss these physical characteristics as key
 metrics when describing athletes. Therefore, we are curious about better
 understanding the extent to which these differ (if at all).
 
 Firstly, we are hoping to understand if the optimal build of an Olympic
-athlete differs by `sex` or by `sport`. For example, a high performing
-male Olympic wrestler is likely to have a different build versus a
-typical female gymnast. Pretty disparate builds, right? Even within one
-sport, say gymnastics, we hypothesize that there may be different
-optimal heights and weights for successful athletes of different sexes.
+athlete differs by `sex` and/or by `sport`. For example, we suspect that
+a high performing male Olympic wrestler is more likely to have a
+different build than a typical female gymnast. Therefore, we hypothesize
+that there may be different optimal heights and weights for successful
+athletes of different sexes and depending on the sport.
 
-Secondly, we will assess if the mean age of Olympic participants for a
-given `year` has changed with time by `sex`. We know that over time the
-Olympics have transitioned from an amateur to professional competition.
-Therefore, we are curious to see if this has any association with the
-ages of participants since we know that certain age are more optimal for
-“peak performance” than others. We will separate the visualization by
-`sex` because while there an approximately equal number of males and
-females in the world, we know that access to athletics participation is
-not always equal which could be associated with participation rates by
-`age`.
+Secondly, we will assess if the mean age of Olympic participants has
+changed over time for each `sex`. In the 2020 Olympics, there was a lot
+of media attention on younger Olympians. Therefore, we are curious how
+the mean age of participants has changed over time. With `age` being a
+key physical characteristic, we think this will add another key
+dimension to gaining a better understanding of the athletes
+participating.
 
 ### Approach
-
-(1-2 paragraphs) Describe what types of plots you are going to make to
-address your question. For each plot, provide a clear explanation as to
-why this plot (e.g. boxplot, barplot, histogram, etc.) is best for
-providing the information you are asking about. The two plots should be
-of different types, and at least one of the two plots needs to use
-either color mapping or facets.
 
 For our first plot, we plan to use boxplots to plot the distribution of
 a size characteristic by `sex` (since characteristics tend to differ
 among males and females) and faceting by `sport`. We are unsure which of
-the `height`, `weight`, `height / weight`, or `bmi` ratio will be most
+the `height`, `weight`, `height / weight`, or [body mass index ratio (a
+measure that integrates height and weight into a single
+metric)](https://en.wikipedia.org/wiki/Body_mass_index) will be most
 telling when examined across sexes and sports. We will start by making 4
 plots (each with one of these on the y-axis) and then select the plot
-where the trends are most insightful.
-
-Two of these variables require new calculations in the data wrangling
-step. In order to plot the height-weight-ratio, we will have to create
-two new calculated columns. First, a `height_weight_ratio` column that
-simply divides an athlete’s `height` by their `weight`, and a more
-complicated `BMI` column that represents an existing
-metric–[BMI](https://en.wikipedia.org/wiki/Body_mass_index)–that
-integrates height and weight into a single measure. .
-
-Based on the results from these preliminary plots, in addition to
-narrowing in on a size characteristic, we might pick a few select sports
-to focus in on (i.e. most popular sports) or group the sports based on
-common characteristics (ex: contact vs. non-contact, etc.) since there
-are 66 sports in the dataset.
+where the trends are most insightful. Based on the results from these
+preliminary plots, in addition to narrowing in on a size characteristic,
+we might pick a few select sports to focus in on (i.e. most popular
+sports) or group the sports based on common characteristics (ex: contact
+vs. non-contact, etc.) since there are 66 sports in the dataset. We
+think a boxplot makes the most sense because they not only make it is
+easy to visualize distributions across a range of divisions but they
+also best control for outliers. Boxplots add outliers as points which is
+a better approach than ridge lines and violins which look relatively
+flat with a wide spread distribution.
 
 For our second plot, we are going to make a scatter plot of average
 `age` vs. `year` color mapped by `sex`. To start, we will find the
 average age of the participants by sex for each year. This will allow us
-to a not too crowded scatter plot since there are now only two
-observations (one for Male and one for Female) for each year. We choose
-a scatter plot because we believe it can best best represent the
-relationship and highlight potential trends. We considered a line plot
-but ultimately decided that the autonomy of each of the points (rather
-than them being connected) would better allow us to compare observations
-`year` by `year`. Since there is. unique context that surrounds each
-Olympics game, we feel as though a more year-specific approach could be
-more meaningful.
+to make a scatter plot with only two observations (one for Male and one
+for Female) for each year. We choose a scatter plot because we believe
+it can best represent the relationship and highlight potential trends.
+We considered a line plot but ultimately decided that the discreteness
+of each of the points (rather than them being connected) would better
+allow us to compare observations `year` by `year`. Since there is unique
+context that surrounds each Olympics game, we feel as though a more
+year-specific (point based) approach could be more meaningful.
 
 ### Analysis
+
+In order to plot using BMI, we must first create the variable and select
+our font:
 
 ``` r
 # Create new calculated variables to represent physical build
 olympics <- olympics %>%
-  mutate(height_weight_ratio = height / weight,
-         BMI = 10000 * weight / (height * height))
+  mutate(
+    height_weight_ratio = height / weight,
+    BMI = 10000 * weight / (height * height)
+  )
 
 # load Olympic font
 font_add_google(name = "Oswald")
@@ -137,24 +147,28 @@ After examining each of `height`, `weight`, `height_weight_ratio`, and
 `BMI`, we have chosen to proceed with `BMI` as our size characteristic
 for this plot, as the visualizations were the most accessible and
 intuitive to interpret. After examining the plot displaying the `BMI`
-for all sports, we are choosing a few select groups of sports to
-include. The next step is to create separate dataframes for each of
-these categories. We also want to represent each athlete once on the
-plot, so we will have to use `distinct()`.
+for all sports, we are choosing a few select groups of sports to include
+based on common characteristics of each of them. The next step is to
+create separate dataframes for each of these categories. We also want to
+represent each athlete once on the plot, so we will have to use
+`distinct()`.
 
 ``` r
 # create variable to represent category of sport
 # keep only one observation per athlete
 olympics <- olympics %>%
-    distinct(id, .keep_all = TRUE) %>%
+  distinct(id, .keep_all = TRUE) %>%
   mutate(sex = factor(sex, labels = c("Female", "Male"))) %>%
   filter(sport %in% c("Boxing", "Judo", "Weightlifting", "Wrestling", "Gymnastics", "Trampolining", "Archery", "Shooting", "Athletics", "Rowing")) %>%
-  mutate(category = case_when(
-                    sport %in% c("Boxing", "Judo", "Weightlifting", "Wrestling") ~ "weightclass",
-                    sport %in% c("Gymnastics", "Trampolining") ~ "acrobatic",
-                    sport %in% c("Archery", "Shooting") ~ "coordination",
-                    TRUE ~ "diverse"),
-        category = factor(category, levels = c("acrobatic", "diverse", "coordination", "weightclass")))
+  mutate(
+    category = case_when(
+      sport %in% c("Boxing", "Judo", "Weightlifting", "Wrestling") ~ "weightclass",
+      sport %in% c("Gymnastics", "Trampolining") ~ "acrobatic",
+      sport %in% c("Archery", "Shooting") ~ "coordination",
+      TRUE ~ "diverse"
+    ),
+    category = factor(category, levels = c("acrobatic", "diverse", "coordination", "weightclass"))
+  )
 
 # create separate dataframes for each of these categories
 olympics_weightclass <- olympics %>%
@@ -177,30 +191,34 @@ dropped from the dataframe when creating the boxplots.
 ``` r
 ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
-  labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
-       y = NULL,
-       color = "Sex",
-       title = "Sex vs Body Mass Index Distribution",
-       subtitle = "For athletes competing in weightclass-based Olympic sports",,
-       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  labs(
+    x = "Body Mass Index (kg/m<sup>2</sup>)",
+    y = NULL,
+    color = "Sex",
+    title = "Sex vs Body Mass Index Distribution",
+    subtitle = "For athletes competing in weightclass-based Olympic sports", ,
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
   scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
-  theme(strip.background = element_blank(),
-        strip.text.y = element_blank(),
-        panel.spacing.y = unit(0.4, "cm"),
-        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
-        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
-        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
-        axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
-        axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.title = element_blank(),
-        legend.position = c(0.9, 0.97),
-        legend.background = element_rect(size = 0.3),
-        legend.margin = margin(1, 5, 5, 5),
-        legend.key.size = unit(0.5, "cm"))
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.title = element_blank(),
+    legend.position = c(0.9, 0.97),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm")
+  )
 ```
 
 <img src="README_files/figure-gfm/plot-weightclass-1.png" width="80%" />
@@ -208,30 +226,34 @@ ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = 
 ``` r
 ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
-  labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
-       y = NULL,
-       color = "Sex",
-       title = "Sex vs Body Mass Index Distribution",
-       subtitle = "For athletes competing in coordination-based Olympic sports",,
-       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  labs(
+    x = "Body Mass Index (kg/m<sup>2</sup>)",
+    y = NULL,
+    color = "Sex",
+    title = "Sex vs Body Mass Index Distribution",
+    subtitle = "For athletes competing in coordination-based Olympic sports", ,
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
   scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
-  theme(strip.background = element_blank(),
-        strip.text.y = element_blank(),
-        panel.spacing.y = unit(0.4, "cm"),
-        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
-        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
-        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
-        axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
-        axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.title = element_blank(),
-        legend.position = c(0.9, 0.97),
-        legend.background = element_rect(size = 0.3),
-        legend.margin = margin(1, 5, 5, 5),
-        legend.key.size = unit(0.5, "cm"))
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.title = element_blank(),
+    legend.position = c(0.9, 0.97),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm")
+  )
 ```
 
 <img src="README_files/figure-gfm/plot-coordination-1.png" width="80%" />
@@ -239,30 +261,34 @@ ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex
 ``` r
 ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
-  labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
-       y = NULL,
-       color = "Sex",
-       title = "Sex vs Body Mass Index Distribution",
-       subtitle = "For athletes competing in Olympic sports which encompass many skills",,
-       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  labs(
+    x = "Body Mass Index (kg/m<sup>2</sup>)",
+    y = NULL,
+    color = "Sex",
+    title = "Sex vs Body Mass Index Distribution",
+    subtitle = "For athletes competing in Olympic sports which encompass many skills", ,
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
   scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
-  theme(strip.background = element_blank(),
-        strip.text.y = element_blank(),
-        panel.spacing.y = unit(0.4, "cm"),
-        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
-        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
-        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
-        axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
-        axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.title = element_blank(),
-        legend.position = c(0.9, 0.9),
-        legend.background = element_rect(size = 0.3),
-        legend.margin = margin(1, 5, 5, 5),
-        legend.key.size = unit(0.5, "cm"))
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.title = element_blank(),
+    legend.position = c(0.9, 0.9),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm")
+  )
 ```
 
 <img src="README_files/figure-gfm/plot-diverse-1.png" width="80%" />
@@ -270,30 +296,34 @@ ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
 ``` r
 ggplot(olympics_acrobatic, mapping = aes(y = sport, x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
-  labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
-       y = NULL,
-       color = "Sex",
-       title = "Sex vs Body Mass Index Distribution",
-       subtitle = "For athletes competing in acrobatic Olympic sports",,
-       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  labs(
+    x = "Body Mass Index (kg/m<sup>2</sup>)",
+    y = NULL,
+    color = "Sex",
+    title = "Sex vs Body Mass Index Distribution",
+    subtitle = "For athletes competing in acrobatic Olympic sports", ,
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
   scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
-  theme(strip.background = element_blank(),
-        strip.text.y = element_blank(),
-        panel.spacing.y = unit(0.4, "cm"),
-        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
-        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
-        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
-        axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
-        axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.title = element_blank(),
-        legend.position = c(0.9, 0.97),
-        legend.background = element_rect(size = 0.3),
-        legend.margin = margin(1, 5, 5, 5),
-        legend.key.size = unit(0.5, "cm"))
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.title = element_blank(),
+    legend.position = c(0.9, 0.97),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm")
+  )
 ```
 
 <img src="README_files/figure-gfm/plot-acrobatic-1.png" width="80%" />
@@ -313,30 +343,34 @@ Olympic sports.
 ``` r
 ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
   geom_boxplot(position = position_dodge2(10)) +
-  labs(x = "Body Mass Index (kg/m<sup>2</sup>)",
-       y = NULL,
-       color = "Sex",
-       title = "Sex vs Body Mass Index Distribution",
-       subtitle = "For athletes competing in selected Olympic sports from 1912-2020",,
-       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  labs(
+    x = "Body Mass Index (kg/m<sup>2</sup>)",
+    y = NULL,
+    color = "Sex",
+    title = "Sex vs Body Mass Index Distribution",
+    subtitle = "For athletes competing in selected Olympic sports from 1912-2020", ,
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
   scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
-  theme(strip.background = element_blank(),
-        strip.text.y = element_blank(),
-        panel.spacing.y = unit(0.4, "cm"),
-        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
-        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
-        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
-        axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
-        axis.text.y = element_text(family = "Oswald", color = "#092260"),
-        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.title = element_blank(),
-        legend.position = c(0.9, 0.97),
-        legend.background = element_rect(size = 0.3),
-        legend.margin = margin(1, 5, 5, 5),
-        legend.key.size = unit(0.5, "cm"))
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260"),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.title = element_blank(),
+    legend.position = c(0.9, 0.97),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm")
+  )
 ```
 
 <img src="README_files/figure-gfm/fonts-and-plot-one-1.png" width="80%" />
@@ -358,7 +392,7 @@ repeated multiple times.
 ``` r
 # keep only one observation per athlete
 olympics <- olympics %>%
-    distinct(id, year, .keep_all = TRUE) %>%
+  distinct(id, year, .keep_all = TRUE) %>%
   mutate(sex = factor(sex, labels = c("Female", "Male")))
 ```
 
@@ -370,37 +404,39 @@ unknown.
 olympics %>%
   drop_na(age) %>%
   group_by(year, sex) %>%
-  summarise(avg_age = mean(age)) %>%
+  dplyr::summarise(avg_age = mean(age), .groups = "drop_last") %>%
   arrange(desc(sex)) %>%
   ggplot(mapping = aes(y = avg_age, x = year)) +
   geom_point(aes(color = sex)) +
-  labs(x = "Year",
-       y = "Age",
-       color = "Sex",
-       title = "Average Yearly Age of Athletes By Sex",
-       subtitle = "For athletes competing in selected Olympic sports from 1912-2020",
-       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  labs(
+    x = "Year",
+    y = "Age",
+    color = "Sex",
+    title = "Average Yearly Age of Athletes By Sex",
+    subtitle = "For athletes competing in selected Olympic sports from 1912-2020",
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
   scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
   theme_minimal() +
-  theme(strip.background = element_blank(),
-        strip.text.y = element_blank(),
-        panel.spacing.y = unit(0.4, "cm"),
-        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
-        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
-        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
-        axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
-        axis.title.y = element_text(family = "Oswald", color = "#092260", size = 14),
-        axis.text.y = element_text(family = "Oswald", color = "#092260"),
-        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.title = element_blank(),
-        legend.position = c(0.8, 0.68),
-        legend.background = element_rect(size = 0.3),
-        legend.margin = margin(1, 5, 5, 5),
-        legend.key.size = unit(0.5, "cm"))
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_text(family = "Oswald", color = "#092260", size = 14),
+    axis.title.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260"),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.title = element_blank(),
+    legend.position = c(0.8, 0.68),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm")
+  )
 ```
-
-    ## `summarise()` has grouped output by 'year'. You can override using the `.groups` argument.
 
 <img src="README_files/figure-gfm/age-plot-1.png" width="80%" />
 
@@ -409,10 +445,6 @@ captures the range of ages of athletes for a given year.
 
 ### Discussion
 
-(1-3 paragraphs) In the Discussion section, interpret the results of
-your analysis. Identify any trends revealed (or not revealed) by the
-plots. Speculate about why the data looks the way it does.
-
 In the “Sex vs Body Mass Index Distribution” plots, men typically have a
 higher-centered distribution of `BMI` than women in the same sport, but
 other trends are more apparent by `category`. In the first plot, which
@@ -420,8 +452,8 @@ includes wrestling, weightlifting, judo, and boxing, we see a strong
 right skew in most distributions. We interpret this as a reflection of
 the weight classes present in those sports, with many participants
 entering in lower weight classes, giving a lower center, but a
-non-insignificant number of athletes with BMIs higher than 30. However,
-there are fewer at these high BMIs, possibly due to the difficulty in
+non-trivial number of athletes with BMIs higher than 30. However, there
+are fewer at these high BMIs, possibly due to the difficulty in
 maintaining athletic competitiveness at that proportion. Shooting and
 archery also have generally higher BMIs than other sports, and again a
 right-skew is observed in the distributions. This reflects those sports’
@@ -444,37 +476,37 @@ found that the mean `age` of athletes by `sex` has changed pretty
 significantly over the years. For instance, the range of mean ages
 participating has converged pretty dramatically. Prior to the 1970s, the
 mean ages fluctuated in the 20-30 years old range with even some
-significant outliers hitting 35 and 50 years old in some cases. However,
-after the 1970s, it appears as though the mean ages converged in the
-25-27 years old range. This makes sense because, according to a
-Britannica article found
-[here](https://www.britannica.com/sports/Olympic-Games), the 1970s were
-a turning point for the games moving from allowing professional athletes
-to compete rather than just amateurs. The article also notes that it
-wasn’t until the 1980s that fully-fledged professional participation was
-permitted. With this information, we can speculate that there might be
-an association between the allowing of professional athletes and the
-convergence. Perhaps since most professional athletes are around 25
-years old (a point of peak physical ability of many), the mean age
-reflects the demographic shift (amateur to professional) of
-participants.
+outliers hitting 35 and 50 years old in some cases. However, since the
+1970s, it appears that the mean ages have remained steady in the 25-27
+years old range. This makes sense because, according to a Britannica
+article found [here](https://www.britannica.com/sports/Olympic-Games),
+the 1970s were a turning point for the games moving from allowing
+professional athletes to compete rather than just amateurs. The article
+also notes that it wasn’t until the 1980s that fully-fledged
+professional participation was permitted. With this information, we can
+speculate that there might be an association between the allowing of
+professional athletes and the convergence of mean ages. Perhaps since
+most professional athletes are around 25 years old (a point of peak
+physical ability for many), the mean age reflects the demographic shift
+(amateur to professional) of participants.
 
 In addition to age converging, it is interesting to note the difference
 between Males and Females. For all years but 3, the mean age of males
 was higher than females. Perhaps since males take longer to physically
-mature (puberty is at a later age), that could explain why their ability
-to compete at “peak perform” in a professional context is at a later
-age. Moreover, it’s possible that the extreme variability between mean
-ages of females prior to 1950 is the result of fewer females competing.
-With fewer competitors, it’s more likely that outlier events (extremely
-old participants) can skew the mean. For example, prior to 1920, there
-were 210 female participants versus 9,790 male participants as depicted
-below.
+mature (puberty is at a later age as described
+[here](https://www.nhs.uk/live-well/sexual-health/stages-of-puberty-what-happens-to-boys-and-girls/)),
+that could explain why their ability to compete at “peak perform” in a
+professional context is at a later age. Moreover, it’s possible that the
+extreme variability between mean ages of females prior to 1950 is the
+result of fewer females competing. With fewer competitors, it’s more
+likely that outlier events (extremely old participants) can skew the
+mean. For example, prior to 1920, there were 210 female participants
+versus 9,790 male participants as depicted below.
 
 ``` r
 olympics %>%
   filter(year <= 1920) %>%
-  count(sex)
+  dplyr::count(sex)
 ```
 
     ## # A tibble: 2 × 2
@@ -486,7 +518,7 @@ olympics %>%
 These numbers are the total number of unique participants participating
 in each Olympics game prior to 1920.
 
-## Question 2 \<- Does the economic status of a country, measured by GDP, make it more successful than others in the Olympics? Which countries are most successful, regardless of GDP, and in which sports do they achieve this success?
+## Question 2 \<- Examining Medal-Winning Countries
 
 ### Introduction
 
@@ -522,6 +554,11 @@ zoom in and look at one specific country’s success, using the `sport`,
 plot, we will load in external historical GDP per capita data and use
 this external data along with `total_winners` to visualize the
 relationship between a country’s wins and its economic indicators.
+
+Thus, the question we will examine is the following: which countries are
+most successful at the games and is this success potentially influenced
+by performance in particular sports or by the economic status of a
+country (as measured by GDP)?
 
 ### Approach
 
@@ -563,14 +600,17 @@ noc_regions <- read_csv(file = paste0(here::here(), "/data/noc_regions.csv"), sh
 
 # make appropriate date for chronological plotting and convert characters in medal wins to numeric values
 olympics %<>%
-  mutate(date = ifelse(season == "Winter", paste0(year, "-02-01"), paste0(year, "-07-01")),
-         date = ymd(date),
-         medal_winner = ifelse(is.na(medal), 0, 1),
-         medal_score = case_when(
-           medal == "Bronze" ~ 1,
-           medal == "Silver" ~ 2,
-           medal == "Gold" ~ 3,
-           TRUE ~ 0))
+  mutate(
+    date = ifelse(season == "Winter", paste0(year, "-02-01"), paste0(year, "-07-01")),
+    date = ymd(date),
+    medal_winner = ifelse(is.na(medal), 0, 1),
+    medal_score = case_when(
+      medal == "Bronze" ~ 1,
+      medal == "Silver" ~ 2,
+      medal == "Gold" ~ 3,
+      TRUE ~ 0
+    )
+  )
 
 noc_regions %<>%
   janitor::clean_names() %>%
@@ -582,7 +622,7 @@ olympics <- left_join(olympics, noc_regions, by = "noc")
 olympics_filter <- olympics %>%
   filter(season == "Summer") %>%
   group_by(region) %>%
-  dplyr::summarise(total_winners = sum(medal_winner), total_score = sum(medal_score))%>%
+  dplyr::summarise(total_winners = sum(medal_winner), total_score = sum(medal_score)) %>%
   filter(total_winners >= 910)
 ```
 
@@ -638,32 +678,36 @@ usa_fil <- olympics %>%
   summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop")%>%
   filter(sport %in% c("Swimming", "Athletics"))
 
-ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport))+
-  geom_line()+
-  geom_point()+
-  labs(x = "Year",
-       y = "Medal Count",
-       title = "USA Olympic Medals Won in Athletics and Swimming",
-       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    x = "Year",
+    y = "Medal Count",
+    title = "USA Olympic Medals Won in Athletics and Swimming",
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
   theme_minimal() +
-  scale_color_manual(values = c("#7B38EC","#5CC0AB"))+
-  scale_x_continuous(limits = c(1896,2016), breaks = seq(1896, 2016, by = 16))+
-  theme(strip.background = element_blank(),
-        strip.text.y = element_blank(),
-        panel.spacing.y = unit(0.4, "cm"),
-        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
-        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
-        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
-        axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
-        axis.text.y = element_text(family = "Oswald", color = "#092260"),
-        axis.title.y = element_markdown(family = "Oswald", color = "#092260", size = 14),
-        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.title = element_blank(),
-        legend.position = c(0.8, 0.18),
-        legend.background = element_rect(size = 0.3),
-        legend.margin = margin(1, 5, 5, 5),
-        legend.key.size = unit(0.5, "cm"))
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  scale_x_continuous(limits = c(1896, 2016), breaks = seq(1896, 2016, by = 8)) +
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260"),
+    axis.title.y = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.title = element_blank(),
+    legend.position = c(0.8, 0.18),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm")
+  )
 ```
 
 <img src="README_files/figure-gfm/usa-victories-plot-1.png" width="80%" />
@@ -699,9 +743,11 @@ olympics_gdp <- olympics %>%
   group_by(region, date, season) %>%
   dplyr::summarise(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop") %>%
   rename(entity = region) %>%
-  mutate(year = year(date),
-         summer_highlight = ifelse(total_winners > 100, T, F),
-         winter_highlight = ifelse(total_winners > 30, T, F)) %>%
+  mutate(
+    year = year(date),
+    summer_highlight = ifelse(total_winners > 100, T, F),
+    winter_highlight = ifelse(total_winners > 30, T, F)
+  ) %>%
   left_join(gdp, by = c("entity", "year")) %>%
   rename(country = entity)
 ```
@@ -717,37 +763,44 @@ olympics_gdp %>%
   filter(!is.na(gdp_per_capita), season == "Winter", year %in% c(2000:2020)) %>%
   ggplot(aes(x = gdp_per_capita, y = total_winners)) +
   geom_point(aes(color = winter_highlight, size = winter_highlight), alpha = .5, size = .75, show.legend = FALSE) +
-  geom_text_repel(data = winter_highlight, aes(x = gdp_per_capita, y = total_winners, label = country),
-                                        color = "#7B38EC", size = 3.5, family = "Oswald") +
+  geom_text_repel(
+    data = winter_highlight, aes(x = gdp_per_capita, y = total_winners, label = country),
+    color = "#7B38EC", size = 3.5, family = "Oswald"
+  ) +
   facet_wrap(~year, ncol = 1) +
   scale_color_manual(values = c("#5CC0AB", "#7B38EC")) +
-  labs(title = "Total Medals Won vs. GDP per capita",
-       subtitle = "Winter Olympics, 2002-2014",
-       y = "Total Medals Won",
-       x = "GDP per capita (USD)",
-       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  labs(
+    title = "Total Medals Won vs. GDP per capita",
+    subtitle = "Winter Olympics, 2002-2014",
+    y = "Total Medals Won",
+    x = "GDP per capita (USD)",
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
   scale_y_continuous(breaks = seq(from = 0, to = 100, by = 50)) +
   scale_x_continuous(
     breaks = seq(from = 0, to = 90000, by = 30000),
-    labels = label_dollar(scale = .001, prefix = "$", suffix = "K")) +
+    labels = label_dollar(scale = .001, prefix = "$", suffix = "K")
+  ) +
   theme_minimal() +
-  theme(strip.background = element_blank(),
-        strip.text.y = element_blank(),
-        panel.spacing.y = unit(0.4, "cm"),
-        legend.title = element_blank(),
-        legend.position = c(0.8, 0.68),
-        legend.background = element_rect(size = 0.3),
-        legend.margin = margin(1, 5, 5, 5),
-        legend.key.size = unit(0.5, "cm"),
-        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
-        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
-        strip.text = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
-        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
-        axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
-        axis.text.y = element_text(family = "Oswald", color = "#092260", size = 8),
-        axis.title.y = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.text = element_text(family = "Oswald", color = "#092260", size = 14))
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    legend.title = element_blank(),
+    legend.position = c(0.8, 0.68),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    strip.text = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260", size = 8),
+    axis.title.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14)
+  )
 ```
 
 <img src="README_files/figure-gfm/faceted-gdp-plots-1.png" width="80%" />
@@ -759,39 +812,47 @@ summer_highlight <- olympics_gdp %>%
 olympics_gdp %>%
   filter(!is.na(gdp_per_capita), season == "Summer", year %in% c(2004:2020)) %>%
   ggplot(aes(x = gdp_per_capita, y = total_winners)) +
-  geom_point(aes(color = summer_highlight, size = summer_highlight), 
-             alpha = .5, size = .75, show.legend = FALSE) +
-  geom_text_repel(data = summer_highlight, aes(x = gdp_per_capita, y = total_winners, label = country),
-                                        color = "#7B38EC", size = 3.5, family = "Oswald") +
+  geom_point(aes(color = summer_highlight, size = summer_highlight),
+    alpha = .5, size = .75, show.legend = FALSE
+  ) +
+  geom_text_repel(
+    data = summer_highlight, aes(x = gdp_per_capita, y = total_winners, label = country),
+    color = "#7B38EC", size = 3.5, family = "Oswald"
+  ) +
   facet_wrap(~year, ncol = 1) +
   scale_color_manual(values = c("#5CC0AB", "#7B38EC")) +
-  labs(title = "Total Medals Won vs. GDP per capita",
-       subtitle = "Winter Olympics, 2004-2016",
-       y = "Total Medals Won",
-       x = "GDP per capita (USD)",
-       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  labs(
+    title = "Total Medals Won vs. GDP per capita",
+    subtitle = "Winter Olympics, 2004-2016",
+    y = "Total Medals Won",
+    x = "GDP per capita (USD)",
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
   scale_y_continuous(breaks = seq(from = 0, to = 300, by = 100)) +
   scale_x_continuous(
     breaks = seq(from = 0, to = 90000, by = 30000),
-    labels = label_dollar(scale = .001, prefix = "$", suffix = "K")) +
+    labels = label_dollar(scale = .001, prefix = "$", suffix = "K")
+  ) +
   theme_minimal() +
-  theme(strip.background = element_blank(),
-        strip.text.y = element_blank(),
-        panel.spacing.y = unit(0.4, "cm"),
-        legend.title = element_blank(),
-        legend.position = c(0.8, 0.68),
-        legend.background = element_rect(size = 0.3),
-        legend.margin = margin(1, 5, 5, 5),
-        legend.key.size = unit(0.5, "cm"),
-        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
-        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
-        strip.text = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
-        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
-        axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
-        axis.text.y = element_text(family = "Oswald", color = "#092260", size = 8),
-        axis.title.y = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.text = element_text(family = "Oswald", color = "#092260", size = 14))
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    legend.title = element_blank(),
+    legend.position = c(0.8, 0.68),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    strip.text = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260", size = 8),
+    axis.title.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14)
+  )
 ```
 
 <img src="README_files/figure-gfm/faceted-gdp-plots-2.png" width="80%" />
@@ -800,10 +861,13 @@ olympics_gdp %>%
 olympics_gdp %>%
   filter(!is.na(gdp_per_capita), country != "Qatar", season == "Summer", year %in% c(2004:2020)) %>%
   ggplot(aes(x = gdp_per_capita, y = total_winners)) +
-  geom_point(aes(color = summer_highlight, size = summer_highlight), 
-             alpha = .5, size = .75, show.legend = FALSE) +
-  geom_text_repel(data = summer_highlight, aes(x = gdp_per_capita, y = total_winners, label = country),
-                                        color = "#7B38EC", size = 3.5, family = "Oswald") +
+  geom_point(aes(color = summer_highlight, size = summer_highlight),
+    alpha = .5, size = .75, show.legend = FALSE
+  ) +
+  geom_text_repel(
+    data = summer_highlight, aes(x = gdp_per_capita, y = total_winners, label = country),
+    color = "#7B38EC", size = 3.5, family = "Oswald"
+  ) +
   facet_wrap(~year, ncol = 1) +
   scale_color_manual(values = c("#5CC0AB", "#7B38EC")) +
   labs(title = "Total Medals Won vs. GDP per capita",
@@ -814,25 +878,28 @@ olympics_gdp %>%
   scale_y_continuous(breaks = seq(from = 0, to = 300, by = 100)) +
   scale_x_continuous(
     breaks = seq(from = 0, to = 90000, by = 30000),
-    labels = label_dollar(scale = .001, prefix = "$", suffix = "K")) +
+    labels = label_dollar(scale = .001, prefix = "$", suffix = "K")
+  ) +
   theme_minimal() +
-  theme(strip.background = element_blank(),
-        strip.text.y = element_blank(),
-        panel.spacing.y = unit(0.4, "cm"),
-        legend.title = element_blank(),
-        legend.position = c(0.8, 0.68),
-        legend.background = element_rect(size = 0.3),
-        legend.margin = margin(1, 5, 5, 5),
-        legend.key.size = unit(0.5, "cm"),
-        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
-        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
-        strip.text = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
-        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
-        axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
-        axis.text.y = element_text(family = "Oswald", color = "#092260", size = 8),
-        axis.title.y = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.text = element_text(family = "Oswald", color = "#092260", size = 14))
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    panel.spacing.y = unit(0.4, "cm"),
+    legend.title = element_blank(),
+    legend.position = c(0.8, 0.68),
+    legend.background = element_rect(size = 0.3),
+    legend.margin = margin(1, 5, 5, 5),
+    legend.key.size = unit(0.5, "cm"),
+    plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
+    plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
+    strip.text = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
+    axis.text.x = element_text(family = "Oswald", color = "#092260"),
+    axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
+    axis.text.y = element_text(family = "Oswald", color = "#092260", size = 8),
+    axis.title.y = element_text(family = "Oswald", color = "#092260", size = 14),
+    legend.text = element_text(family = "Oswald", color = "#092260", size = 14)
+  )
 ```
 
 <img src="README_files/figure-gfm/faceted-gdp-plots-3.png" width="80%" />
@@ -845,17 +912,22 @@ winter_gdp <- olympics_gdp %>%
   filter(!is.na(gdp_per_capita), season == "Winter", year %in% c(1950:2020)) %>%
   ggplot(aes(x = gdp_per_capita, y = total_winners)) +
   geom_point(aes(color = winter_highlight), alpha = .5, size = 2, show.legend = FALSE) +
-  geom_text(data = winter_highlight, aes(x = gdp_per_capita, y = total_winners, label = country),
-                                        color = "#7B38EC", size = 4, family = "Oswald", vjust = .2) +
+  geom_text(
+    data = winter_highlight, aes(x = gdp_per_capita, y = total_winners, label = country),
+    color = "#7B38EC", size = 4, family = "Oswald", vjust = .2
+  ) +
   scale_color_manual(values = c("#5CC0AB", "#7B38EC")) +
-  labs(title = "Total Medals Won vs. GDP per capita",
-       subtitle = "Winter Olympics, 1950-2020\nYear: {closest_state}",
-       y = "Total Medals Won",
-       x = "GDP per capita (USD)",
-       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
+  labs(
+    title = "Total Medals Won vs. GDP per capita",
+    subtitle = "Winter Olympics, 1950-2020\nYear: {closest_state}",
+    y = "Total Medals Won",
+    x = "GDP per capita (USD)",
+    caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com"
+  ) +
   scale_x_continuous(
     breaks = seq(from = 0, to = 90000, by = 30000),
-    labels = label_dollar(scale = .001, prefix = "$", suffix = "K")) +
+    labels = label_dollar(scale = .001, prefix = "$", suffix = "K")
+  ) +
   theme_minimal() +
   theme(strip.background = element_blank(),
         strip.text.y = element_blank(),
@@ -928,20 +1000,86 @@ Our presentation can be found [here](presentation/presentation.html).
 
 ## Data
 
-Include a citation for your data here. See
-<http://libraryguides.vu.edu.au/c.php?g=386501&p=4347840> for guidance
-on proper citation for datasets. If you got your data off the web, make
-sure to note the retrieval date.
-
 Sports Reference 2018, *120 years of Olympic history: athletes and
-results*, electronic dataset, kaggle, viewed 16 September 2021,
+results*, electronic dataset, Kaggle, viewed 16 September 2021,
 <https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results>
+
+Bolt, J, van Zanden J. L. 2020, *GDP per capita, 1820-2018*, electronic
+dataset, OurWorldInData, viewed 30 September 2021,
+<https://ourworldindata.org/grapher/gdp-per-capita-maddison-2020>
 
 ## References
 
-List any references here. You should, at a minimum, list your data
-source.
-
 Sports Reference 2018, *120 years of Olympic history: athletes and
-results*, electronic dataset, kaggle, viewed 16 September 2021,
+results*, electronic dataset, Kaggle, viewed 16 September 2021,
 <https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results>
+
+Bolt, J, van Zanden J. L. 2020, *GDP per capita, 1820-2018*, electronic
+dataset, OurWorldInData, viewed 30 September 2021,
+<https://ourworldindata.org/grapher/gdp-per-capita-maddison-2020>
+
+#### Packages Used
+
+Claus O. Wilke 2020, *ggtext: Improved Text Rendering Support for
+‘ggplot2’.*, R package version 0.1.1.
+<https://CRAN.R-project.org/package=ggtext>
+
+Garrett Grolemund, Hadley Wickham 2011, *Dates and Times Made Easy with
+lubridate.*, Journal of Statistical Software, 40(3), 1-25.
+<https://www.jstatsoft.org/v40/i03/>
+
+Hadley Wickham 2011, *The Split-Apply-Combine Strategy for Data
+Analysis.*, Journal of Statistical Software, 40(1), 1-29.
+<http://www.jstatsoft.org/v40/i01/>
+
+Hadley Wickham, Romain François, Lionel Henry and Kirill Müller 2021,
+*dplyr: A Grammar of Data Manipulation.*, <https://dplyr.tidyverse.org>,
+<https://github.com/tidyverse/dplyr>
+
+Hadley Wickham and Dana Seidel 2020, *scales: Scale Functions for
+Visualization.*, <https://scales.r-lib.org>,
+<https://github.com/r-lib/scales>
+
+Kamil Slowikowski 2021, *ggrepel: Automatically Position Non-Overlapping
+Text Labels with ‘ggplot2’.*, R package version 0.9.1.
+<https://github.com/slowkow/ggrepel>
+
+Thomas Lin Pedersen and David Robinson 2020, *gganimate: A Grammar of
+Animated Graphics.*, <https://gganimate.com>,
+<https://github.com/thomasp85/gganimate>
+
+Jeroen Ooms 2021, *gifski: Highest Quality GIF Encoder.*,
+<https://gif.ski/> (upstream), <https://github.com/r-rust/gifski>
+(devel).
+
+Stefan Milton Bache and Hadley Wickham 2020, *magrittr: A Forward-Pipe
+Operator for R.*, <https://magrittr.tidyverse.org>,
+<https://github.com/tidyverse/magrittr>
+
+Wickham et al., 2019, *Welcome to the tidyverse.*, Journal of Open
+Source Software, 4(43), 1686, <https://doi.org/10.21105/joss.01686>
+
+Yixuan Qiu et al., 2021, *showtext: Using Fonts More Easily in R
+Graphs.*, R package version 0.9-4.
+<https://CRAN.R-project.org/package=showtext>
+
+[BMI](http=s://en.wikipedia.org/wiki/Body_mass_index)
+
+We found a citation for the Tokyo 2020 Olympics logo font
+[here](https://www.reddit.com/r/identifythisfont/comments/4ig8ua/font_used_on_the_tokyo_2020_logo/)
+and were pointed to an open-source alternative
+[here](https://graphicdesign.stackexchange.com/questions/7178/is-there-a-din-font-free-alternative).
+
+We got the hex code used in plot text manually from that logo source. We
+chose the hex codes for our favorite gender color mapping from Telegraph
+2018 [here](https://blog.datawrapper.de/gendercolor/).
+
+according to a Britannica article found
+[here](https://www.britannica.com/sports/Olympic-Games)
+
+puberty is at a later age as described
+[here](https://www.nhs.uk/live-well/sexual-health/stages-of-puberty-what-happens-to-boys-and-girls/)
+
+Kirill Müller and Lorenz Walthert (2021). styler: Non-Invasive Pretty
+Printing of R Code. <https://github.com/r-lib/styler>,
+<https://styler.r-lib.org>.
