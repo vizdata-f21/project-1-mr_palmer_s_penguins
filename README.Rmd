@@ -6,13 +6,13 @@ output: github_document
 
 ```{r load-packages, echo = FALSE}
 # load packages here
-library(lubridate)
-library(countrycode)
-library(gganimate)
-library(plyr)
-library(gifski)
-library(dplyr)
-library(scales)
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(countrycode))
+suppressPackageStartupMessages(library(gganimate))
+suppressPackageStartupMessages(library(plyr))
+suppressPackageStartupMessages(library(gifski))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(scales))
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(showtext)) # cool fonts
 suppressPackageStartupMessages(library(magrittr))
@@ -21,7 +21,7 @@ suppressPackageStartupMessages(library(ggtext)) # superscript in plot labels
 
 ```{r load-data, echo = FALSE}
 # load data here
-olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
+olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"), show_col_types = FALSE)
 
 ```
 
@@ -122,7 +122,7 @@ ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = 
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "For athletes competing in weightclass-based Olympic sports",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
@@ -151,7 +151,7 @@ ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "For athletes competing in coordination-based Olympic sports",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
@@ -180,7 +180,7 @@ ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "For athletes competing in Olympic sports which encompass many skills",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
@@ -209,7 +209,7 @@ ggplot(olympics_acrobatic, mapping = aes(y = sport, x = BMI, color = sex)) +
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "For athletes competing in acrobatic Olympic sports",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
@@ -242,7 +242,7 @@ ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "For athletes competing in selected Olympic sports from 1912-2020",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
@@ -287,7 +287,7 @@ Finally, we will make the plot showing the average yearly `age` of athletes by `
 olympics %>%
   drop_na(age) %>%
   group_by(year, sex) %>%
-  summarise(avg_age = mean(age)) %>%
+  dplyr::summarise(avg_age = mean(age), .groups = "drop_last") %>%
   arrange(desc(sex)) %>%
   ggplot(mapping = aes(y = avg_age, x = year)) +
   geom_point(aes(color = sex)) +
@@ -582,6 +582,10 @@ Include a citation for your data here.
 See http://libraryguides.vu.edu.au/c.php?g=386501&p=4347840 for guidance on proper citation for datasets. 
 If you got your data off the web, make sure to note the retrieval date.
 
+Sports Reference 2018, *120 years of Olympic history: athletes and results*, electronic dataset, kaggle, viewed  September 2021, https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results
+
 ## References
 
 List any references here. You should, at a minimum, list your data source.
+
+Sports Reference 2018, *120 years of Olympic history: athletes and results*, electronic dataset, kaggle, viewed 16 September 2021, https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results

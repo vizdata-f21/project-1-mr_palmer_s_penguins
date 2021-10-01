@@ -2,42 +2,6 @@ Project title
 ================
 by Mr. Palmer’s Penguins
 
-    ## 
-    ## Attaching package: 'lubridate'
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     date, intersect, setdiff, union
-
-    ## Loading required package: ggplot2
-
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:plyr':
-    ## 
-    ##     arrange, count, desc, failwith, id, mutate, rename, summarise,
-    ##     summarize
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
-
-    ## Rows: 271116 Columns: 15
-
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr (10): name, sex, team, noc, games, season, city, sport, event, medal
-    ## dbl  (5): id, age, height, weight, year
-
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
 ## Introduction
 
 The set, which includes 15 variables and 271116 observations, provides
@@ -208,7 +172,7 @@ ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = 
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "For athletes competing in weightclass-based Olympic sports",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
@@ -239,7 +203,7 @@ ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "For athletes competing in coordination-based Olympic sports",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
@@ -270,7 +234,7 @@ ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "For athletes competing in Olympic sports which encompass many skills",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
@@ -301,7 +265,7 @@ ggplot(olympics_acrobatic, mapping = aes(y = sport, x = BMI, color = sex)) +
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "For athletes competing in acrobatic Olympic sports",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
@@ -344,7 +308,7 @@ ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "For athletes competing in selected Olympic sports from 1912-2020",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
@@ -395,7 +359,7 @@ unknown.
 olympics %>%
   drop_na(age) %>%
   group_by(year, sex) %>%
-  summarise(avg_age = mean(age)) %>%
+  dplyr::summarise(avg_age = mean(age), .groups = "drop_last") %>%
   arrange(desc(sex)) %>%
   ggplot(mapping = aes(y = avg_age, x = year)) +
   geom_point(aes(color = sex)) +
@@ -424,8 +388,6 @@ olympics %>%
         legend.margin = margin(1, 5, 5, 5),
         legend.key.size = unit(0.5, "cm"))
 ```
-
-    ## `summarise()` has grouped output by 'year'. You can override using the `.groups` argument.
 
 <img src="README_files/figure-gfm/age-plot-1.png" width="80%" />
 
@@ -886,7 +848,15 @@ Include a citation for your data here. See
 on proper citation for datasets. If you got your data off the web, make
 sure to note the retrieval date.
 
+Sports Reference 2018, *120 years of Olympic history: athletes and
+results*, electronic dataset, kaggle, viewed September 2021,
+<https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results>
+
 ## References
 
 List any references here. You should, at a minimum, list your data
 source.
+
+Sports Reference 2018, *120 years of Olympic history: athletes and
+results*, electronic dataset, kaggle, viewed 16 September 2021,
+<https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results>
