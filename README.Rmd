@@ -341,32 +341,28 @@ olympics %>%
 
 These numbers are the total number of unique participants participating in each Olympics game prior to 1920.
 
-## Question 2 <- Update title to relate to the question you’re answering
+## Question 2 <- Does the economic status of a country, measured by GDP, make it more successful than others in the Olympics? Which countries are most successful, regardless of GDP, and in which sports do they achieve this success?
 
 ### Introduction
 
-(1-2 paragraphs)
-Introduction to the question and what parts of the dataset are necessary to answer the question. Also discuss why you’re interested in this question.
+The Olympics are a historic sports event that have been running for over a 125 years now, and to really grasp the full story of success at the Olympics, we want to first take a broader view and find out which countries have been most successful at all the Olympic games and in which sports. After conducting this research and creating relavant plots, we will continue on to testing a hypothesis we developed regarding a connection between a country's Olympic success and its economic output. We are interested in testing this theory that a more economically powerful country will have more success at the Olympics as we often hear that these countries are able to provide the resources and facilities needed for their athletes to achieve great success.
+
+We will be using a variable we create, `medal_count`, for the first plot, and this will help us differentiate total Olympic success for different countries. We will then zoom in and look at one specific country's success, using the `sport`, `noc`, and `year` variables along with `medal_count`. For the second plot, we will load in external data regarding the GDP of countries that have participated in the Olympics, and use this external data along with `medal_count` and `medal_score` to compare success to GDP. `Medal_score` will be another variable we create that weights the winning of a gold medal heavier than a silver medal, and a silver heavier than a bronze.
 
 ### Approach
 
-(1-2 paragraphs)
-Describe what types of plots you are going to make to address your question.
-For each plot, provide a clear explanation as to why this plot (e.g. boxplot, barplot, histogram, etc.) is best for providing the information you are asking about. 
-The two plots should be of different types, and at least one of the two plots needs to use either color mapping or facets.
+In our first visualization, we will create a bar chart to represent the winningest countries in the history of the Olympics. Country codes will be on the x-axis and total medal count, a new variable we will create, will be on the y-axis. To avoid having an extremely left skewed bar chart with many countries who have won very few medals, we will represent the top 10 winningest countries of all time on our bar chart. This plot will help us gauge the amount of medals the top ten most winningest countries have won, and how they compare to each other. After creating this plot, we will select one country of interest and examine which sports have contributed most heavily to this country's success. We will then plot out the results of these sports over time to see how their contribution to this country's medal count may have changed over the years.
+
+For our second visualization,
 
 ### Analysis
-
-(2-3 code blocks, 2 figures, text/code comments as needed)
-In this section, provide the code that generates your plots. Use scale functions to provide nice axis labels and guides.
-You are welcome to use theme functions to customize the appearance of your plot, but you are not required to do so.
-All plots must be made with ggplot2. Do not use base R or lattice plotting functions.
-#### Plot 1
 
 ```{r}
 olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
 noc_regions <- read_csv(file = paste0(here::here(), "/data/noc_regions.csv"))
 ```
+
+Above we have loaded the olympic dataset and also the full country names into the noc_regions object.
 
 ```{r wrangling-medals}
 # make appropriate date
@@ -389,6 +385,9 @@ flags <- tibble(noc = noc_regions$noc, region = noc_regions$region, flag = count
 olympics <- left_join(olympics, flags, by = "noc")
 ```
 
+The data wrangling step above involves adding the month and day to the dates of our summer and winter olympic data to help us plot it as time series data, should we need to do this. We then clean the noc_regions data and attach emoji symbols for the country's flags onto the dataset with a left join.
+
+
 ```{r}
 olympics_filter <- olympics %>%
   filter(season == "Summer") %>%
@@ -397,6 +396,10 @@ olympics_filter <- olympics %>%
   filter(total_winners >= 910)
 
 ```
+
+We have now filtered the data to be used in our first visualization for only Summer Olympic success, as different countries may be successful in different seasons. For this visualization, we are interested in the Summer Olympics. We then summarize the total medals as the sum of the `medal_winner` column, which represents 1 or 0 for if an athlete won a medal or not, and add up the `medal_score` column to get a total score that weights gold, silver and bronze medals.
+
+###Plot 1
 
 ```{r}
 
@@ -425,6 +428,8 @@ ggplot(olympics_filter, aes(x = reorder(noc, total_winners), y = total_winners, 
 
 ```
 
+Here is our first plot, which represents the 10 countries that have won the most medals in Summer Olympic history.
+
 ```{r}
 
 usa_fil <- olympics %>%
@@ -433,6 +438,8 @@ usa_fil <- olympics %>%
   summarize(total_winners = sum(medal_winner), total_score = sum(medal_score))%>%
   filter(sport %in% c("Swimming", "Athletics"))
 ```
+
+After taking a closer look at the data used to create the first visualization, we decided to represent the contribution of the USA's two most successful sports to our medal count at each Summer olympic games over time. We filter by the country code "USA" and by sport and year, filtering for only swimming and athletics.
 
 ```{r}
 
@@ -464,38 +471,7 @@ ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport))+
 
 ```
 
-```{r}
-
-usa_fil2 <- ddply(usa_fil, .(sport), transform, cumsumwin = cumsum(total_winners))
-
-ggplot(usa_fil2, aes(x = year, y = cumsumwin, color = sport, group = sport))+
-  geom_line()+
-  labs(x = "Year",
-       y = "Cumulative Medal Count",
-       title = "USA Cumulative Olympic Medals Won in Athletics and Swimming",
-       caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  theme_minimal() +
-  scale_color_manual(values = c("#7B38EC","#5CC0AB"))+
-  theme(strip.background = element_blank(),
-        strip.text.y = element_blank(),
-        panel.spacing.y = unit(0.4, "cm"),
-        plot.title = element_text(family = "Oswald", color = "#092260", size = 20, hjust = 0.5),
-        plot.caption = element_text(family = "Oswald", color = "#092260", size = 11),
-        plot.subtitle = element_text(family = "Oswald", color = "#092260", size = 14, hjust = 0.5),
-        axis.text.x = element_text(family = "Oswald", color = "#092260"),
-        axis.title.x = element_markdown(family = "Oswald", color = "#092260", size = 14),
-        axis.text.y = element_text(family = "Oswald", color = "#092260"),
-        axis.title.y = element_markdown(family = "Oswald", color = "#092260", size = 14),
-        legend.text = element_text(family = "Oswald", color = "#092260", size = 14),
-        legend.title = element_blank(),
-        legend.position = c(0.8, 0.18),
-        legend.background = element_rect(size = 0.3),
-        legend.margin = margin(1, 5, 5, 5),
-        legend.key.size = unit(0.5, "cm"))
-
-```
-
-In our first visualization, we will plot `medals_total` on the y-axis and `date` on the x-axis with lines grouped by `country` and faceting by `sport`. We will select just a few sports of interest to compare and use selective color mapping for countries of interest and transparency to strongly highlight a few countries and make the remaining lines indistinguishable in the background. If this technique remains visually overwhelming after prototyping our plot, we will filter to select just a few countries of interest in each sport and color map only those.
+Here we have plotted the number of medals won in Athletics and Swimming at each Summer Olympic games over the years.
 
 #### Plot 2
 
@@ -592,9 +568,9 @@ animate(p, duration = 20, fps = 10, renderer = gifski_renderer())
 
 ### Discussion
 
-(1-3 paragraphs)
-In the Discussion section, interpret the results of your analysis. Identify any trends revealed (or not revealed) by the plots.
-Speculate about why the data looks the way it does.
+After plotting the 10 most successful Summer Olympic countries in history, it is clear that the USA has a wide lead over the USSR, which is in second place, and other countries behind them, including Great Britain, Germany, France, and Italy. The United States, as seen in the visualization, has won over 5,000 Summer Olympic medals, while the USSR has won just over 2,000, Britain a similar amount, and we can see a steady decline after that. We can assume that the USSR's grasp on second place total medals will soon be overtaken as they have split into many smaller countries and Russia, and can no longer win medals under the USSR title. Because of this and the wide gap between first and second place, we decided to examine the data to see which sports contributed most to the success of the Americans. After examining the data and grouping the USA's medals by sport, it was clear that the two most successful American Summer Olympic sports were swimming and athletics.
+
+The immense contribution of swimming and athletics to American Summer Olympic success makes sense as these two sports consist of many events with lots of medals up for grabs, as compared to a sport like basketball in which only one medal can be one at each Summer Olympics. We wanted to now examine the success of the USA in these two sports, swimming and athletics, and see if it has changed over time. After grouping USA's Summer Olympic data by sport and year, we filter for swimming and athletic data to see how the Americans have fared in these two sports over time, compared to each other. The plot shows that from the first Olympic games until the 1960 games, the USA won more athletic medals than swimming medals at every occurrence of the Summer Olympics. But, starting in 1960, The number of medals won by the USA in swimming overtook the same number for athletics, and since then, the United States has won more swimming than athletic medals at every Olympic games. The data is missing values for 1940 and 1944 because of World War II, and for 1980 because of the worldwide boycott of the Russian Olympic games. The trend seen is very interesting, as we can see that in the late 20th century, there was a small gap between the number of medals won in swimming and athletics, but starting in 1996 and continuing through the turn of the century, the gap started to widen. This could be because of a multitude of reasons, including more USA swimming development or the addition of more swimming events. In the last three Olympics for which we have data, we can see that the gap between the two sports stays relatively steady but success in both is on the rise.
 
 ## Presentation
 
