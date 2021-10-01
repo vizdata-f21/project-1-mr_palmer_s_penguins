@@ -14,6 +14,7 @@ suppressPackageStartupMessages(library(gifski))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(scales))
 suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(countrycode))
 suppressPackageStartupMessages(library(showtext)) # cool fonts
 suppressPackageStartupMessages(library(magrittr))
 suppressPackageStartupMessages(library(ggtext)) # superscript in plot labels
@@ -375,6 +376,10 @@ olympics %<>%
 noc_regions %<>%
   janitor::clean_names() %>%
   mutate(region = ifelse(region == "Boliva", "Bolivia", region))
+
+flags <- tibble(noc = noc_regions$noc, region = noc_regions$region, flag = countrycode(noc_regions$region, 'country.name', 'unicode.symbol'))
+
+olympics <- left_join(olympics, flags, by = "noc")
 ```
 
 The data wrangling step above involves adding the month and day to the dates of our summer and winter olympic data to help us plot it as time series data, should we need to do this. We then clean the noc_regions data.
@@ -469,7 +474,7 @@ Here we have plotted the number of medals won in Athletics and Swimming at each 
 #### Plot 2
 
 ```{r}
-detach(package:plyr, unload = TRUE)
+#detach(package:plyr, unload = TRUE)
 gdp <- read_csv("data/gdp-per-capita-maddison-2020.csv")
 
 gdp %<>%
@@ -490,7 +495,7 @@ gdp %<>%
 ```{r}
 olympics_gdp <- olympics %>%
   group_by(region, date, season, flag) %>%
-  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop") %>%
+  dplyr::summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop") %>%
   rename(entity = region) %>%
   mutate(year = year(date),
          summer_highlight = ifelse(total_winners > 100, T, F),

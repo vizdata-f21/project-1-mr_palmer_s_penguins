@@ -2,6 +2,17 @@ Project title
 ================
 by Mr. Palmer’s Penguins
 
+    ## Rows: 271116 Columns: 15
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (10): name, sex, team, noc, games, season, city, sport, event, medal
+    ## dbl  (5): id, age, height, weight, year
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
 ## Introduction
 
 The set, which includes 15 variables and 271116 observations, provides
@@ -172,7 +183,7 @@ ggplot(olympics_weightclass, mapping = aes(y = fct_rev(sport), x = BMI, color = 
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "For athletes competing in weightclass-based Olympic sports",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
@@ -203,7 +214,7 @@ ggplot(olympics_coordination, mapping = aes(y = rev(sport), x = BMI, color = sex
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "For athletes competing in coordination-based Olympic sports",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
@@ -234,7 +245,7 @@ ggplot(olympics_diverse, mapping = aes(y = sport, x = BMI, color = sex)) +
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "For athletes competing in Olympic sports which encompass many skills",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
@@ -265,7 +276,7 @@ ggplot(olympics_acrobatic, mapping = aes(y = sport, x = BMI, color = sex)) +
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "For athletes competing in acrobatic Olympic sports",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
@@ -308,7 +319,7 @@ ggplot(olympics, mapping = aes(y = sport, x = BMI, color = sex)) +
        title = "Sex vs Body Mass Index Distribution",
        subtitle = "For athletes competing in selected Olympic sports from 1912-2020",,
        caption = "Source: Sports Reference & OlympStats\nCompiled by kaggle.com") +
-  scale_color_manual(values = c("#7B38EC", "#5CC0AB"), guide = guide_legend(reverse = TRUE)) +
+  scale_color_manual(values = c("#7B38EC", "#5CC0AB")) +
   facet_grid(category ~ ., scales = "free_y", space = "free") +
   theme_minimal() +
   theme(strip.background = element_blank(),
@@ -359,7 +370,7 @@ unknown.
 olympics %>%
   drop_na(age) %>%
   group_by(year, sex) %>%
-  dplyr::summarise(avg_age = mean(age), .groups = "drop_last") %>%
+  summarise(avg_age = mean(age)) %>%
   arrange(desc(sex)) %>%
   ggplot(mapping = aes(y = avg_age, x = year)) +
   geom_point(aes(color = sex)) +
@@ -388,6 +399,8 @@ olympics %>%
         legend.margin = margin(1, 5, 5, 5),
         legend.key.size = unit(0.5, "cm"))
 ```
+
+    ## `summarise()` has grouped output by 'year'. You can override using the `.groups` argument.
 
 <img src="README_files/figure-gfm/age-plot-1.png" width="80%" />
 
@@ -520,6 +533,9 @@ For our second visualization,
 
 ### Analysis
 
+Above we have loaded the olympic dataset and also the full country names
+into the noc\_regions object.
+
 ``` r
 olympics <- read_csv(file = paste0(here::here(), "/data/olympics_data.csv"))
 ```
@@ -549,9 +565,6 @@ noc_regions <- read_csv(file = paste0(here::here(), "/data/noc_regions.csv"))
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
-Above we have loaded the olympic dataset and also the full country names
-into the noc\_regions object.
-
 ``` r
 # make appropriate date
 olympics %<>%
@@ -580,8 +593,7 @@ olympics <- left_join(olympics, flags, by = "noc")
 The data wrangling step above involves adding the month and day to the
 dates of our summer and winter olympic data to help us plot it as time
 series data, should we need to do this. We then clean the noc\_regions
-data and attach emoji symbols for the country’s flags onto the dataset
-with a left join.
+data.
 
 ``` r
 olympics_filter <- olympics %>%
@@ -625,7 +637,7 @@ ggplot(olympics_filter, aes(x = reorder(noc, total_winners), y = total_winners, 
         legend.position = "none")
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-4-1.png" width="80%" />
+<img src="README_files/figure-gfm/unnamed-chunk-3-1.png" width="80%" />
 
 Here is our first plot, which represents the 10 countries that have won
 the most medals in Summer Olympic history.
@@ -675,7 +687,7 @@ ggplot(usa_fil, aes(x = year, y = total_winners, color = sport, group = sport))+
         legend.key.size = unit(0.5, "cm"))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-6-1.png" width="80%" />
+<img src="README_files/figure-gfm/unnamed-chunk-5-1.png" width="80%" />
 
 Here we have plotted the number of medals won in Athletics and Swimming
 at each Summer Olympic games over the years.
@@ -683,7 +695,7 @@ at each Summer Olympic games over the years.
 #### Plot 2
 
 ``` r
-detach(package:plyr, unload = TRUE)
+#detach(package:plyr, unload = TRUE)
 gdp <- read_csv("data/gdp-per-capita-maddison-2020.csv")
 ```
 
@@ -720,7 +732,7 @@ gdp %<>%
 ``` r
 olympics_gdp <- olympics %>%
   group_by(region, date, season, flag) %>%
-  summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop") %>%
+  dplyr::summarize(total_winners = sum(medal_winner), total_score = sum(medal_score), .groups = "drop") %>%
   rename(entity = region) %>%
   mutate(year = year(date),
          summer_highlight = ifelse(total_winners > 100, T, F),
@@ -770,7 +782,7 @@ olympics_gdp %>%
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-9-1.png" width="80%" />
+<img src="README_files/figure-gfm/unnamed-chunk-8-1.png" width="80%" />
 
 ``` r
 summer_highlight <- olympics_gdp %>%
@@ -814,11 +826,7 @@ olympics_gdp %>%
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14))
 ```
 
-<<<<<<< HEAD
-<img src="README_files/figure-gfm/unnamed-chunk-11-1.png" width="80%" />
-=======
-<img src="README_files/figure-gfm/unnamed-chunk-9-2.png" width="80%" />
->>>>>>> 6c2971738a400315b9e5910dd8f285b676010647
+<img src="README_files/figure-gfm/unnamed-chunk-9-1.png" width="80%" />
 
 ``` r
 olympics_gdp %>%
@@ -859,7 +867,7 @@ olympics_gdp %>%
         legend.text = element_text(family = "Oswald", color = "#092260", size = 14))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-11-2.png" width="80%" />
+<img src="README_files/figure-gfm/unnamed-chunk-9-2.png" width="80%" />
 
 ``` r
 winter_highlight <- olympics_gdp %>%
@@ -902,11 +910,7 @@ winter_gdp <- olympics_gdp %>%
 animate(winter_gdp, duration = 20, fps = 10, renderer = gifski_renderer())
 ```
 
-<<<<<<< HEAD
-<img src="README_files/figure-gfm/unnamed-chunk-12-1.gif" width="80%" />
-=======
 <img src="README_files/figure-gfm/unnamed-chunk-10-1.gif" width="80%" />
->>>>>>> 6c2971738a400315b9e5910dd8f285b676010647
 
 ### Discussion
 
@@ -962,7 +966,7 @@ on proper citation for datasets. If you got your data off the web, make
 sure to note the retrieval date.
 
 Sports Reference 2018, *120 years of Olympic history: athletes and
-results*, electronic dataset, kaggle, viewed September 2021,
+results*, electronic dataset, kaggle, viewed 16 September 2021,
 <https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results>
 
 ## References
